@@ -12,13 +12,13 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
     const kbFiles = Array.from(kbFilesInput.files).map(f => ({
         name: f.name,
         size: f.size,
-        type: f.type
+        type: f.type,
     }));
 
     const payload = {
         feature,
         kbLinks,
-        kbFiles, // пока просто метаданные
+        kbFiles,
         language: document.getElementById("language").value,
         include: {
             questions: document.getElementById("incQuestions").checked,
@@ -26,9 +26,9 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
             testCases: document.getElementById("incTC").checked,
             negativeScenarios: document.getElementById("incNeg").checked,
             outOfScope: document.getElementById("incOOS").checked,
-            useKnowledgeBase: document.getElementById("useKB").checked
+            useKnowledgeBase: document.getElementById("useKB").checked,
         },
-        // позже сюда можно добавлять parentRequestId
+        parentRequestId: window.isRegeneration ? window.lastRequestId : null,
     };
 
     document.getElementById("result").innerText = "Генерация...";
@@ -36,37 +36,19 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
     const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
     });
 
     const data = await res.json();
     document.getElementById("result").innerText = data.result || "Ошибка";
 
-    window.lastRequestId = data.requestId; // для фидбека и будущей повторной генерации
+    window.lastRequestId = data.requestId;
+    window.isRegeneration = false;
     document.getElementById("regenerateBtn").style.display = "block";
 });
 
-// «Сгенерировать ещё раз» — пока просто повторно отправляем форму
+// «Сгенерировать ещё раз»
 document.getElementById("regenerateBtn").addEventListener("click", () => {
+    window.isRegeneration = true;
     document.getElementById("generateForm").dispatchEvent(new Event("submit"));
-});
-
-// Фидбек
-document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const payload = {
-        rating: Number(document.getElementById("rating").value),
-        comment: document.getElementById("comment").value,
-        email: document.getElementById("email").value,
-        requestId: window.lastRequestId || null
-    };
-
-    await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
-
-    alert("Спасибо! Фидбек отправлен.");
 });
