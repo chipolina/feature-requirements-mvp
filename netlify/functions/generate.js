@@ -110,10 +110,6 @@ exports.handler = async (event) => {
       "Status": "in_progress",
     };
 
-    // parent request (линк)
-    if (parentRequestId) {
-      fields["Parent Request"] = [{ id: parentRequestId }];
-    }
 
     const createRes = await fetch(
       `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(
