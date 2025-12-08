@@ -4,78 +4,402 @@
     <meta charset="UTF-8" />
     <title>AI Requirements Generator</title>
     <style>
-        body { font-family: sans-serif; max-width: 900px; margin: 40px auto; }
-        textarea { width: 100%; height: 150px; }
-        input, textarea { margin-bottom: 10px; }
-        .block { margin-bottom: 25px; }
-        #result { white-space: pre-wrap; background: #fafafa; padding: 15px; border: 1px solid #ddd; }
+        :root {
+            --bg: #f4f5fb;
+            --card-bg: #ffffff;
+            --border: #e0e3f0;
+            --accent: #4f46e5;
+            --accent-soft: rgba(79, 70, 229, 0.08);
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 16px 40px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            background: radial-gradient(circle at top left, #eef2ff 0, #f4f5fb 45%, #f9fafb 100%);
+            color: var(--text-main);
+        }
+
+        .page {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 20px 20px 18px;
+            box-shadow:
+                0 18px 45px rgba(15, 23, 42, 0.08),
+                0 0 0 1px rgba(148, 163, 184, 0.16);
+        }
+
+        .card + .card {
+            margin-top: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        textarea,
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select {
+            width: 100%;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            padding: 9px 10px;
+            font: inherit;
+            font-size: 13px;
+            resize: vertical;
+            background: #f9fafb;
+        }
+
+        textarea {
+            min-height: 130px;
+        }
+
+        input[type="file"] {
+            font-size: 13px;
+        }
+
+        textarea:focus,
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-soft);
+            background: #ffffff;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 6px 12px;
+            margin-top: 6px;
+        }
+
+        .checkbox-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 9px;
+            border-radius: 999px;
+            background: #f9fafb;
+            border: 1px solid var(--border);
+            font-size: 12px;
+        }
+
+        .checkbox-pill input {
+            margin: 0;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .button,
+        button {
+            border-radius: 999px;
+            border: none;
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.05s ease, box-shadow 0.1s ease, background 0.1s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.30);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-0.5px);
+            box-shadow: 0 14px 24px rgba(79, 70, 229, 0.36);
+        }
+
+        .btn-secondary {
+            background: #eef2ff;
+            color: #3730a3;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e7ff;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            padding-inline: 8px;
+            box-shadow: none;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: #3730a3;
+        }
+
+        #result {
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.55;
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--border);
+            padding: 12px 12px;
+            background: #f9fafb;
+            max-height: 520px;
+            overflow: auto;
+        }
+
+        #regenerateBtn {
+            margin-top: 10px;
+        }
+
+        .feedback-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.7fr) minmax(0, 2.3fr);
+            gap: 10px;
+        }
+
+        .rating-input {
+            max-width: 80px;
+        }
+
+        footer {
+            margin-top: 18px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: right;
+        }
     </style>
 </head>
 <body>
+<div class="page">
+    <header>
+        <h1>AI Requirements Generator (MVP)</h1>
+        <p>Быстрая генерация требований, критериев приёмки и тест-кейсов на основе описания фичи и базы знаний.</p>
+    </header>
 
-<h1>AI Requirements Generator (MVP)</h1>
+    <div class="layout">
+        <!-- Левая колонка: форма генерации -->
+        <div>
+            <form id="generateForm" class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Описание фичи</div>
+                        <div class="card-subtitle">Это основной источник правды для анализа.</div>
+                    </div>
+                    <span class="badge">Шаг 1</span>
+                </div>
 
-<form id="generateForm">
+                <div class="field">
+                    <textarea id="feature" required placeholder="Например: пользователь может устанавливать дедлайн для задачи..."></textarea>
+                </div>
 
-    <!-- Описание фичи -->
-    <div class="block">
-        <label><b>Описание фичи:</b></label><br>
-        <textarea id="feature" required></textarea>
+                <div class="card-header" style="margin-top: 10px;">
+                    <div>
+                        <div class="card-title">База знаний</div>
+                        <div class="card-subtitle">Опционально. Помогает согласовать фичу с текущим продуктом.</div>
+                    </div>
+                    <span class="badge">Опционально</span>
+                </div>
+
+                <div class="field">
+                    <label for="kbLinks">Ссылки (по одной в строке)</label>
+                    <textarea id="kbLinks" placeholder="https://..."></textarea>
+                    <div class="hint">Можно добавить ссылки на документацию, Confluence, Notion и т.п.</div>
+                </div>
+
+                <div class="field">
+                    <label for="kbFiles">Файлы (до 5)</label>
+                    <input type="file" id="kbFiles" multiple />
+                    <div class="hint">PDF, DOCX, TXT, XLSX — пока используются как контекст, без предпросмотра.</div>
+                </div>
+
+                <div class="field">
+                    <label>Что включать в генерацию</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-pill">
+                            <input type="checkbox" id="incQuestions" checked />
+                            <span>Уточняющие вопросы</span>
+                        </label>
+                        <label class="checkbox-pill">
+                            <input type="checkbox" id="incAC" checked />
+                            <span>Acceptance Criteria</span>
+                        </label>
+                        <label class="checkbox-pill">
+                            <input type="checkbox" id="incTC" checked />
+                            <span>Тест-кейсы</span>
+                        </label>
+                        <label class="checkbox-pill">
+                            <input type="checkbox" id="incNeg" checked />
+                            <span>Негативные сценарии</span>
+                        </label>
+                        <label class="checkbox-pill">
+                            <input type="checkbox" id="incOOS" checked />
+                            <span>Out of Scope</span>
+                        </label>
+                        <label class="checkbox-pill">
+                            <input type="checkbox" id="useKB" checked />
+                            <span>Использовать базу знаний</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <div>
+                        <label for="language">Язык результата</label>
+                        <select id="language">
+                            <option value="RU">Русский</option>
+                            <option value="EN">English</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;"></div>
+                    <button type="submit" class="btn-primary">
+                        Сгенерировать
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Правая колонка: результат + фидбек -->
+        <div>
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Результат</div>
+                        <div class="card-subtitle">Ответ ИИ в markdown-формате (его можно сразу копировать в ТЗ).</div>
+                    </div>
+                    <button id="regenerateBtn" class="btn-secondary" style="display:none;">
+                        Сгенерировать ещё раз
+                    </button>
+                </div>
+
+                <div id="result">Пока пусто — введите описание фичи и запустите генерацию.</div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Обратная связь</div>
+                        <div class="card-subtitle">Помогает улучшать промпт и качество генерации.</div>
+                    </div>
+                </div>
+
+                <form id="feedbackForm">
+                    <div class="feedback-grid">
+                        <div class="field">
+                            <label for="rating">Оценка</label>
+                            <input type="number" id="rating" min="1" max="5" class="rating-input" placeholder="1–5" />
+                        </div>
+                        <div class="field">
+                            <label for="email">Email (необязательно)</label>
+                            <input type="email" id="email" placeholder="Для связи по важным кейсам" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="comment">Комментарий</label>
+                        <textarea id="comment" placeholder="Что было полезно, что не понравилось, что добавить?"></textarea>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:8px; align-items:center;">
+                        <button type="submit" class="btn-secondary">
+                            Отправить фидбек
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
     </div>
 
-    <!-- База знаний -->
-    <div class="block">
-        <label><b>База знаний — ссылки (по одной в строке):</b></label><br>
-        <textarea id="kbLinks"></textarea>
-
-        <br><br>
-        <label><b>Файлы (до 5):</b></label><br>
-        <input type="file" id="kbFiles" multiple />
-    </div>
-
-    <!-- Флаги -->
-    <div class="block">
-        <label><b>Что включать в генерацию:</b></label><br>
-        <label><input type="checkbox" id="incQuestions" checked> Уточняющие вопросы</label><br>
-        <label><input type="checkbox" id="incAC" checked> Acceptance Criteria</label><br>
-        <label><input type="checkbox" id="incTC" checked> Тест-кейсы</label><br>
-        <label><input type="checkbox" id="incNeg" checked> Негативные сценарии</label><br>
-        <label><input type="checkbox" id="incOOS" checked> Out of Scope</label><br>
-        <label><input type="checkbox" id="useKB" checked> Использовать базу знаний</label>
-    </div>
-
-    <!-- Язык -->
-    <div class="block">
-        <label><b>Язык результата:</b></label><br>
-        <select id="language">
-            <option value="RU">Русский</option>
-            <option value="EN">English</option>
-        </select>
-    </div>
-
-    <button type="submit">Сгенерировать</button>
-</form>
-
-<hr>
-
-<!-- РЕЗУЛЬТАТ -->
-<h2>Результат</h2>
-<div id="result">Пока пусто</div>
-
-<button id="regenerateBtn" style="display:none;">Сгенерировать ещё раз</button>
-
-<hr>
-
-<!-- ФИДБЕК -->
-<h3>Обратная связь</h3>
-<form id="feedbackForm">
-    <input type="number" id="rating" min="1" max="5" placeholder="Оценка (1-5)" /><br>
-    <textarea id="comment" placeholder="Комментарий"></textarea><br>
-    <input type="email" id="email" placeholder="Email (необязательно)" /><br>
-    <button type="submit">Отправить фидбек</button>
-</form>
+    <footer>
+        AI Requirements Generator · MVP
+    </footer>
+</div>
 
 <script src="main.js"></script>
-
 </body>
 </html>
