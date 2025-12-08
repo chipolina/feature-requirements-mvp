@@ -231,8 +231,38 @@
         }
 
         .select-compact {
-            max-width: 140px;
+            max-width: 240px;
+            min-width: 200px;
         }
+
+        #downloadBtn {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #ffffff;
+            box-shadow: 0 10px 22px rgba(79, 70, 229, 0.4);
+            animation: pulse-download 1.8s ease-in-out infinite;
+        }
+
+        #downloadBtn:hover {
+            transform: translateY(-0.5px);
+            box-shadow: 0 14px 28px rgba(79, 70, 229, 0.5);
+        }
+
+        @keyframes pulse-download {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.55);
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.0);
+            }
+        }
+
+
     </style>
 </head>
 <body>
@@ -346,13 +376,17 @@
                         <select id="fileFormat" class="select-compact">
                             <option value="md">Markdown (.md)</option>
                             <option value="txt">Текстовый файл (.txt)</option>
-                        </select>
-                        <button type="button" id="downloadBtn" class="btn-secondary">
-                            Сохранить файл
-                        </button>
+                            <option value="word">Word (MVP: .txt)</option>
+                            <option value="pdf">PDF (MVP: .txt)</option>
+                            <option value="xlsx">Excel (MVP: .txt)</option>
+                    </select>
+                    <button type="button" id="downloadBtn" class="btn-secondary">
+                        Сохранить файл
+                    </button>
+                    <div class="hint">
+                        Имя файла = название фичи. Для Word/PDF/Excel в текущем MVP сохраняется текстовый файл (.txt).
                     </div>
-                    <div class="hint">Имя файла = название фичи + выбранный формат.</div>
-                </div>
+
 
                 <!-- Уточняющие вопросы / доп. информация -->
                 <div class="field" style="margin-top: 8px;">

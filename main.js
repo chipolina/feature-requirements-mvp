@@ -96,17 +96,15 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
         return;
     }
 
-    const format = document.getElementById("fileFormat").value; // md | txt
+    const format = document.getElementById("fileFormat").value; // md | txt | word | pdf | xlsx
     const rawTitle = document.getElementById("feature").value.trim();
 
     let baseName = rawTitle || "requirements";
-    // берём первую строку и ограничиваем длину
     baseName = baseName.split("\n")[0].trim();
     if (baseName.length > 60) {
         baseName = baseName.slice(0, 60);
     }
 
-    // чистим имя файла от спецсимволов
     baseName = baseName
         .toLowerCase()
         .replace(/["'`]/g, "")
@@ -114,9 +112,19 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
         .replace(/\s+/g, "_")
         .trim() || "requirements";
 
-    const filename = `${baseName}.${format}`;
+    let ext = format;
+    let mime = "text/plain;charset=utf-8";
 
-    const blob = new Blob([resultText], { type: "text/plain;charset=utf-8" });
+    if (format === "word" || format === "pdf" || format === "xlsx") {
+        // MVP-заглушка: сохраняем как обычный .txt,
+        // но явно предупреждаем пользователя
+        ext = "txt";
+        alert("В текущем MVP форматы Word/PDF/Excel сохраняются как текстовый файл (.txt).");
+    }
+
+    const filename = `${baseName}.${ext}`;
+
+    const blob = new Blob([resultText], { type: mime });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
@@ -127,3 +135,4 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
     a.remove();
     URL.revokeObjectURL(url);
 });
+
