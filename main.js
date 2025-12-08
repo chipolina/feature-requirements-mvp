@@ -3,6 +3,8 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
     e.preventDefault();
 
     const feature = document.getElementById("feature").value;
+    const extraInfo = document.getElementById("extraInfo").value;
+
     const kbLinks = document.getElementById("kbLinks").value
         .split("\n")
         .map(x => x.trim())
@@ -14,7 +16,6 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
         size: f.size,
         type: f.type,
     }));
-    const extraInfo = document.getElementById("extraInfo").value;
 
     const payload = {
         feature,
@@ -36,7 +37,6 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
                 : null,
     };
 
-
     document.getElementById("result").innerText = "Генерация...";
 
     const res = await fetch("/api/generate", {
@@ -54,7 +54,6 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
 
     document.getElementById("clarifyBtn").style.display = "inline-flex";
     document.getElementById("regenerateBtn").style.display = "inline-flex";
-
 });
 
 // «Сгенерировать ещё раз»
@@ -63,8 +62,68 @@ document.getElementById("regenerateBtn").addEventListener("click", () => {
     document.getElementById("generateForm").dispatchEvent(new Event("submit"));
 });
 
+// «Уточнить»
 document.getElementById("clarifyBtn").addEventListener("click", () => {
     window.isClarification = true;
     document.getElementById("generateForm").dispatchEvent(new Event("submit"));
 });
 
+// Фидбек
+document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const payload = {
+        rating: Number(document.getElementById("rating").value),
+        comment: document.getElementById("comment").value,
+        email: document.getElementById("email").value,
+        requestId: window.lastRequestId || null,
+    };
+
+    await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+
+    alert("Спасибо! Фидбек отправлен.");
+});
+
+// Сохранение результата в файл
+document.getElementById("downloadBtn").addEventListener("click", () => {
+    const resultText = document.getElementById("result").innerText || "";
+    if (!resultText || resultText.startsWith("Пока пусто")) {
+        alert("Нет результата для сохранения.");
+        return;
+    }
+
+    const format = document.getElementById("fileFormat").value; // md | txt
+    const rawTitle = document.getElementById("feature").value.trim();
+
+    let baseName = rawTitle || "requirements";
+    // берём первую строку и ограничиваем длину
+    baseName = baseName.split("\n")[0].trim();
+    if (baseName.length > 60) {
+        baseName = baseName.slice(0, 60);
+    }
+
+    // чистим имя файла от спецсимволов
+    baseName = baseName
+        .toLowerCase()
+        .replace(/["'`]/g, "")
+        .replace(/[^\p{L}\p{N}\-_ ]/gu, " ")
+        .replace(/\s+/g, "_")
+        .trim() || "requirements";
+
+    const filename = `${baseName}.${format}`;
+
+    const blob = new Blob([resultText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+});

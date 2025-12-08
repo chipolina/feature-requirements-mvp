@@ -16,9 +16,7 @@
             --radius-md: 10px;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -28,22 +26,15 @@
             color: var(--text-main);
         }
 
-        .page {
-            max-width: 980px;
-            margin: 0 auto;
-        }
+        .page { max-width: 980px; margin: 0 auto; }
 
-        header {
-            margin-bottom: 24px;
-        }
-
+        header { margin-bottom: 24px; }
         header h1 {
             margin: 0 0 8px;
             font-size: 28px;
             font-weight: 700;
             letter-spacing: -0.03em;
         }
-
         header p {
             margin: 0;
             font-size: 14px;
@@ -55,11 +46,8 @@
             grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
             gap: 20px;
         }
-
         @media (max-width: 900px) {
-            .layout {
-                grid-template-columns: minmax(0, 1fr);
-            }
+            .layout { grid-template-columns: minmax(0, 1fr); }
         }
 
         .card {
@@ -71,9 +59,7 @@
                 0 0 0 1px rgba(148, 163, 184, 0.16);
         }
 
-        .card + .card {
-            margin-top: 16px;
-        }
+        .card + .card { margin-top: 16px; }
 
         .card-header {
             display: flex;
@@ -82,15 +68,8 @@
             margin-bottom: 14px;
         }
 
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .card-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+        .card-title { font-size: 16px; font-weight: 600; }
+        .card-subtitle { font-size: 12px; color: var(--text-muted); }
 
         label {
             font-size: 13px;
@@ -114,13 +93,15 @@
             background: #f9fafb;
         }
 
-        textarea {
-            min-height: 130px;
+        textarea { min-height: 130px; }
+
+        /* маленькая высота для базы знаний */
+        .textarea-small {
+            min-height: 60px;
+            max-height: 80px;
         }
 
-        input[type="file"] {
-            font-size: 13px;
-        }
+        input[type="file"] { font-size: 13px; }
 
         textarea:focus,
         input:focus,
@@ -131,9 +112,7 @@
             background: #ffffff;
         }
 
-        .field {
-            margin-bottom: 14px;
-        }
+        .field { margin-bottom: 14px; }
 
         .hint {
             font-size: 12px;
@@ -159,9 +138,7 @@
             font-size: 12px;
         }
 
-        .checkbox-pill input {
-            margin: 0;
-        }
+        .checkbox-pill input { margin: 0; }
 
         .toolbar {
             display: flex;
@@ -191,7 +168,6 @@
             color: #ffffff;
             box-shadow: 0 10px 20px rgba(79, 70, 229, 0.30);
         }
-
         .btn-primary:hover {
             transform: translateY(-0.5px);
             box-shadow: 0 14px 24px rgba(79, 70, 229, 0.36);
@@ -201,10 +177,7 @@
             background: #eef2ff;
             color: #3730a3;
         }
-
-        .btn-secondary:hover {
-            background: #e0e7ff;
-        }
+        .btn-secondary:hover { background: #e0e7ff; }
 
         .btn-ghost {
             background: transparent;
@@ -233,9 +206,7 @@
             overflow: auto;
         }
 
-        #regenerateBtn {
-            margin-top: 10px;
-        }
+        #regenerateBtn { margin-top: 0; }
 
         .feedback-grid {
             display: grid;
@@ -243,15 +214,24 @@
             gap: 10px;
         }
 
-        .rating-input {
-            max-width: 80px;
-        }
+        .rating-input { max-width: 80px; }
 
         footer {
             margin-top: 18px;
             font-size: 11px;
             color: var(--text-muted);
             text-align: right;
+        }
+
+        .inline-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .select-compact {
+            max-width: 140px;
         }
     </style>
 </head>
@@ -277,12 +257,6 @@
                 <div class="field">
                     <textarea id="feature" required placeholder="Например: пользователь может устанавливать дедлайн для задачи..."></textarea>
                 </div>
-                <div class="field">
-                    <label for="extraInfo">Дополнительная информация / ответы на уточняющие вопросы</label>
-                    <textarea id="extraInfo" placeholder="После первого прогона сюда можно вписать ответы на уточняющие вопросы или дополнительные детали по фиче."></textarea>
-                    <div class="hint">Эта информация будет учитываться при следующей генерации.</div>
-                </div>
-
 
                 <div class="card-header" style="margin-top: 10px;">
                     <div>
@@ -294,7 +268,7 @@
 
                 <div class="field">
                     <label for="kbLinks">Ссылки (по одной в строке)</label>
-                    <textarea id="kbLinks" placeholder="https://..."></textarea>
+                    <textarea id="kbLinks" rows="3" class="textarea-small" placeholder="https://..."></textarea>
                     <div class="hint">Можно добавить ссылки на документацию, Confluence, Notion и т.п.</div>
                 </div>
 
@@ -350,7 +324,7 @@
             </form>
         </div>
 
-        <!-- Правая колонка: результат + фидбек -->
+        <!-- Правая колонка: результат + уточнения + фидбек -->
         <div>
             <section class="card">
                 <div class="card-header">
@@ -358,17 +332,39 @@
                         <div class="card-title">Результат</div>
                         <div class="card-subtitle">Ответ ИИ в markdown-формате (его можно сразу копировать в ТЗ).</div>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button id="clarifyBtn" class="btn-secondary" style="display:none;">
-                            Уточнить
+                    <button id="regenerateBtn" class="btn-ghost" style="display:none;">
+                        Сгенерировать ещё раз
+                    </button>
+                </div>
+
+                <div id="result">Пока пусто — введите описание фичи и запустите генерацию.</div>
+
+                <!-- Сохранение результата в файл -->
+                <div class="field" style="margin-top: 12px;">
+                    <label>Сохранить результат</label>
+                    <div class="inline-controls">
+                        <select id="fileFormat" class="select-compact">
+                            <option value="md">Markdown (.md)</option>
+                            <option value="txt">Текстовый файл (.txt)</option>
+                        </select>
+                        <button type="button" id="downloadBtn" class="btn-secondary">
+                            Сохранить файл
                         </button>
-                        <button id="regenerateBtn" class="btn-ghost" style="display:none;">
-                            Сгенерировать ещё раз
+                    </div>
+                    <div class="hint">Имя файла = название фичи + выбранный формат.</div>
+                </div>
+
+                <!-- Уточняющие вопросы / доп. информация -->
+                <div class="field" style="margin-top: 8px;">
+                    <label for="extraInfo">Дополнительная информация / ответы на уточняющие вопросы</label>
+                    <textarea id="extraInfo" placeholder="После первого прогона сюда можно вписать ответы на уточняющие вопросы или дополнительные детали по фиче."></textarea>
+                    <div class="hint">Эта информация будет учитываться при следующей генерации.</div>
+                    <div style="margin-top: 8px; display:flex; justify-content:flex-end;">
+                        <button type="button" id="clarifyBtn" class="btn-secondary" style="display:none;">
+                            Уточнить
                         </button>
                     </div>
                 </div>
-                
-                <div id="result">Пока пусто — введите описание фичи и запустите генерацию.</div>
             </section>
 
             <section class="card">
