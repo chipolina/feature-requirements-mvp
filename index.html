@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>AI Requirements Generator</title>
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: 40px auto; }
+        textarea { width: 100%; height: 150px; }
+        input, textarea { margin-bottom: 10px; }
+        .block { margin-bottom: 25px; }
+        #result { white-space: pre-wrap; background: #fafafa; padding: 15px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+<h1>AI Requirements Generator (MVP)</h1>
+
+<form id="generateForm">
+
+    <!-- Описание фичи -->
+    <div class="block">
+        <label><b>Описание фичи:</b></label><br>
+        <textarea id="feature" required></textarea>
+    </div>
+
+    <!-- База знаний -->
+    <div class="block">
+        <label><b>База знаний — ссылки (по одной в строке):</b></label><br>
+        <textarea id="kbLinks"></textarea>
+
+        <br><br>
+        <label><b>Файлы (до 5):</b></label><br>
+        <input type="file" id="kbFiles" multiple />
+    </div>
+
+    <!-- Флаги -->
+    <div class="block">
+        <label><b>Что включать в генерацию:</b></label><br>
+        <label><input type="checkbox" id="incQuestions" checked> Уточняющие вопросы</label><br>
+        <label><input type="checkbox" id="incAC" checked> Acceptance Criteria</label><br>
+        <label><input type="checkbox" id="incTC" checked> Тест-кейсы</label><br>
+        <label><input type="checkbox" id="incNeg" checked> Негативные сценарии</label><br>
+        <label><input type="checkbox" id="incOOS" checked> Out of Scope</label><br>
+        <label><input type="checkbox" id="useKB" checked> Использовать базу знаний</label>
+    </div>
+
+    <!-- Язык -->
+    <div class="block">
+        <label><b>Язык результата:</b></label><br>
+        <select id="language">
+            <option value="RU">Русский</option>
+            <option value="EN">English</option>
+        </select>
+    </div>
+
+    <button type="submit">Сгенерировать</button>
+</form>
+
+<hr>
+
+<!-- РЕЗУЛЬТАТ -->
+<h2>Результат</h2>
+<div id="result">Пока пусто</div>
+
+<button id="regenerateBtn" style="display:none;">Сгенерировать ещё раз</button>
+
+<hr>
+
+<!-- ФИДБЕК -->
+<h3>Обратная связь</h3>
+<form id="feedbackForm">
+    <input type="number" id="rating" min="1" max="5" placeholder="Оценка (1-5)" /><br>
+    <textarea id="comment" placeholder="Комментарий"></textarea><br>
+    <input type="email" id="email" placeholder="Email (необязательно)" /><br>
+    <button type="submit">Отправить фидбек</button>
+</form>
+
+<script src="main.js"></script>
+
+</body>
+</html>
