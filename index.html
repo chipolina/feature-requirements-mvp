@@ -277,6 +277,12 @@
                 <div class="field">
                     <textarea id="feature" required placeholder="Например: пользователь может устанавливать дедлайн для задачи..."></textarea>
                 </div>
+                <div class="field">
+                    <label for="extraInfo">Дополнительная информация / ответы на уточняющие вопросы</label>
+                    <textarea id="extraInfo" placeholder="После первого прогона сюда можно вписать ответы на уточняющие вопросы или дополнительные детали по фиче."></textarea>
+                    <div class="hint">Эта информация будет учитываться при следующей генерации.</div>
+                </div>
+
 
                 <div class="card-header" style="margin-top: 10px;">
                     <div>
@@ -352,11 +358,16 @@
                         <div class="card-title">Результат</div>
                         <div class="card-subtitle">Ответ ИИ в markdown-формате (его можно сразу копировать в ТЗ).</div>
                     </div>
-                    <button id="regenerateBtn" class="btn-secondary" style="display:none;">
-                        Сгенерировать ещё раз
-                    </button>
+                    <div style="display:flex; gap:8px;">
+                        <button id="clarifyBtn" class="btn-secondary" style="display:none;">
+                            Уточнить
+                        </button>
+                        <button id="regenerateBtn" class="btn-ghost" style="display:none;">
+                            Сгенерировать ещё раз
+                        </button>
+                    </div>
                 </div>
-
+                
                 <div id="result">Пока пусто — введите описание фичи и запустите генерацию.</div>
             </section>
 

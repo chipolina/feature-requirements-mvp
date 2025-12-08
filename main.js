@@ -14,9 +14,11 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
         size: f.size,
         type: f.type,
     }));
+    const extraInfo = document.getElementById("extraInfo").value;
 
     const payload = {
         feature,
+        extraInfo,
         kbLinks,
         kbFiles,
         language: document.getElementById("language").value,
@@ -28,8 +30,12 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
             outOfScope: document.getElementById("incOOS").checked,
             useKnowledgeBase: document.getElementById("useKB").checked,
         },
-        parentRequestId: window.isRegeneration ? window.lastRequestId : null,
+        parentRequestId:
+            (window.isRegeneration || window.isClarification) && window.lastRequestId
+                ? window.lastRequestId
+                : null,
     };
+
 
     document.getElementById("result").innerText = "Генерация...";
 
@@ -44,7 +50,11 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
 
     window.lastRequestId = data.requestId;
     window.isRegeneration = false;
-    document.getElementById("regenerateBtn").style.display = "block";
+    window.isClarification = false;
+
+    document.getElementById("clarifyBtn").style.display = "inline-flex";
+    document.getElementById("regenerateBtn").style.display = "inline-flex";
+
 });
 
 // «Сгенерировать ещё раз»
@@ -52,3 +62,9 @@ document.getElementById("regenerateBtn").addEventListener("click", () => {
     window.isRegeneration = true;
     document.getElementById("generateForm").dispatchEvent(new Event("submit"));
 });
+
+document.getElementById("clarifyBtn").addEventListener("click", () => {
+    window.isClarification = true;
+    document.getElementById("generateForm").dispatchEvent(new Event("submit"));
+});
+

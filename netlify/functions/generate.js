@@ -86,13 +86,15 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body || "{}");
 
     const {
-      feature,
-      kbLinks = [],
-      kbFiles = [],
-      language = "RU",
-      include = {},
-      parentRequestId = null,
+        feature,
+        extraInfo = "",
+        kbLinks = [],
+        kbFiles = [],
+        language = "RU",
+        include = {},
+        parentRequestId = null,
     } = body;
+
 
     // 1. создаём запись в Airtable со статусом in_progress
     const fields = {
@@ -141,12 +143,15 @@ exports.handler = async (event) => {
 
     // 2. вызываем OpenAI
     const userPayload = {
-      feature,
-      kbLinks,
-      kbFiles,       // сейчас тут только метаданные; реальную KB из файлов добавим позже
-      language,
-      include,
+        feature,
+        extraInfo,
+        kbLinks,
+        kbFiles,
+        language,
+        include,
+        parentRequestId,
     };
+
 
     const openaiRes = await fetch(
       "https://api.openai.com/v1/chat/completions",
