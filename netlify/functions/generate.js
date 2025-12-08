@@ -132,12 +132,16 @@ exports.handler = async (event) => {
     const created = await createRes.json();
 
     if (!createRes.ok) {
-      console.error("Airtable create error:", created);
-      return {
+        console.error("Airtable create error:", created);
+    return {
         statusCode: 500,
-        body: JSON.stringify({ error: "Airtable create failed" }),
-      };
+        body: JSON.stringify({
+        error: "Airtable create failed",
+        airtable: created   // <- тут будет точное сообщение Airtable
+        }),
+    };
     }
+
 
     requestId = created.id;
 
