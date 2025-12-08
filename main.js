@@ -1,46 +1,52 @@
+// Генерация
 document.getElementById("generateForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const feature = document.getElementById("feature").value;
-    const kbLinks = document.getElementById("kbLinks").value.split("\n").filter(x => x.trim() !== "");
-    const kbFiles = document.getElementById("kbFiles").files;
+    const kbLinks = document.getElementById("kbLinks").value
+        .split("\n")
+        .map(x => x.trim())
+        .filter(x => x !== "");
+
+    const kbFilesInput = document.getElementById("kbFiles");
+    const kbFiles = Array.from(kbFilesInput.files).map(f => ({
+        name: f.name,
+        size: f.size,
+        type: f.type
+    }));
 
     const payload = {
         feature,
         kbLinks,
+        kbFiles, // пока просто метаданные
         language: document.getElementById("language").value,
         include: {
             questions: document.getElementById("incQuestions").checked,
-            ac: document.getElementById("incAC").checked,
-            tc: document.getElementById("incTC").checked,
-            neg: document.getElementById("incNeg").checked,
-            oos: document.getElementById("incOOS").checked,
-            useKB: document.getElementById("useKB").checked
-        }
+            acceptanceCriteria: document.getElementById("incAC").checked,
+            testCases: document.getElementById("incTC").checked,
+            negativeScenarios: document.getElementById("incNeg").checked,
+            outOfScope: document.getElementById("incOOS").checked,
+            useKnowledgeBase: document.getElementById("useKB").checked
+        },
+        // позже сюда можно добавлять parentRequestId
     };
 
-    const formData = new FormData();
-    formData.append("json", JSON.stringify(payload));
-
-    for (let f of kbFiles) {
-        formData.append("files", f);
-    }
-
     document.getElementById("result").innerText = "Генерация...";
-    
+
     const res = await fetch("/api/generate", {
         method: "POST",
-        body: formData
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
     });
 
     const data = await res.json();
     document.getElementById("result").innerText = data.result || "Ошибка";
 
-    // показать кнопку повторной генерации
-    window.lastRequestId = data.requestId;
+    window.lastRequestId = data.requestId; // для фидбека и будущей повторной генерации
     document.getElementById("regenerateBtn").style.display = "block";
 });
 
+// «Сгенерировать ещё раз» — пока просто повторно отправляем форму
 document.getElementById("regenerateBtn").addEventListener("click", () => {
     document.getElementById("generateForm").dispatchEvent(new Event("submit"));
 });
@@ -50,13 +56,13 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
     e.preventDefault();
 
     const payload = {
-        rating: document.getElementById("rating").value,
+        rating: Number(document.getElementById("rating").value),
         comment: document.getElementById("comment").value,
         email: document.getElementById("email").value,
-        requestId: window.lastRequestId
+        requestId: window.lastRequestId || null
     };
 
-    const res = await fetch("/api/feedback", {
+    await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
