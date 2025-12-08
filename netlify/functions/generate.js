@@ -86,7 +86,7 @@ exports.handler = async (event) => {
       }
     );
 
-    // 4. Отдаём результат фронту
+    // 4. Отдаём результат  фронту
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
