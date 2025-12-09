@@ -265,6 +265,45 @@
             max-width: 240px;
             min-width: 200px;
         }
+                /* Заголовки разделов внутри результата */
+        #result h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 24px;   /* ~2 строки сверху */
+            margin-bottom: 8px; /* ~1 строка снизу */
+        }
+
+        /* Обычные абзацы в результате */
+        #result p {
+            margin: 4px 0 8px;
+        }
+
+        /* Таблица тест-кейсов */
+        #result table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0 12px;
+        }
+
+        #result th,
+        #result td {
+            border: 1px solid rgba(148, 163, 184, 0.7); /* тонкая серая рамка */
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+
+        /* Заголовок таблицы */
+        #result th {
+            background: #f3f4ff;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        /* Первый столбец (ID: TC1, TC2...) — всегда жирный */
+        #result td:first-child {
+            font-weight: 600;
+        }
+
 
         #downloadBtn {
             background: linear-gradient(135deg, #4f46e5, #6366f1);
