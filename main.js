@@ -136,3 +136,31 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
     URL.revokeObjectURL(url);
 });
 
+// Collapse / Expand базы знаний
+const kbToggleBtn = document.getElementById("kbToggle");
+const kbContent = document.getElementById("kbContent");
+
+if (kbToggleBtn && kbContent) {
+    let kbCollapsed = false;
+
+    const updateKbToggleText = () => {
+        kbToggleBtn.textContent = kbCollapsed ? "Показать" : "Свернуть";
+    };
+
+    kbToggleBtn.addEventListener("click", () => {
+        kbCollapsed = !kbCollapsed;
+        kbContent.classList.toggle("kb-collapsed", kbCollapsed);
+        updateKbToggleText();
+    });
+
+    // также позволим кликать по заголовку целиком
+    document.querySelector(".kb-header").addEventListener("click", (e) => {
+        // не дублируем клик по самой кнопке
+        if (e.target === kbToggleBtn) return;
+        kbCollapsed = !kbCollapsed;
+        kbContent.classList.toggle("kb-collapsed", kbCollapsed);
+        updateKbToggleText();
+    });
+
+    updateKbToggleText();
+}

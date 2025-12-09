@@ -43,7 +43,7 @@
 
         .layout {
             display: grid;
-            grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+            grid-template-columns: 1fr;
             gap: 20px;
         }
         @media (max-width: 900px) {
@@ -119,6 +119,37 @@
             color: var(--text-muted);
             margin-top: 2px;
         }
+        .kb-block {
+            margin-top: 10px;
+        }
+
+        .kb-header {
+            cursor: pointer;
+        }
+
+        .kb-toggle-btn {
+            font-size: 12px;
+        }
+
+        /* контейнер с анимацией высоты/прозрачности */
+        .kb-content {
+            overflow: hidden;
+            max-height: 260px; /* хватает на 2 поля */
+            opacity: 1;
+            transform: translateY(0);
+            transition:
+                max-height 0.25s ease,
+                opacity 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        /* состояние свернуто */
+        .kb-content.kb-collapsed {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+
 
         .checkbox-group {
             display: grid;
@@ -288,25 +319,33 @@
                     <textarea id="feature" required placeholder="Например: пользователь может устанавливать дедлайн для задачи..."></textarea>
                 </div>
 
-                <div class="card-header" style="margin-top: 10px;">
-                    <div>
-                        <div class="card-title">База знаний</div>
-                        <div class="card-subtitle">Опционально. Помогает согласовать фичу с текущим продуктом.</div>
+                <!-- БЛОК БАЗЫ ЗНАНИЙ (collapsible) -->
+                <div class="kb-block">
+                    <div class="card-header kb-header">
+                        <div>
+                            <div class="card-title">База знаний</div>
+                            <div class="card-subtitle">Опционально. Помогает согласовать фичу с текущим продуктом.</div>
+                        </div>
+                        <button type="button" id="kbToggle" class="btn-ghost kb-toggle-btn">
+                            Свернуть
+                        </button>
                     </div>
-                    <span class="badge">Опционально</span>
+
+                    <div id="kbContent" class="kb-content">
+                        <div class="field">
+                            <label for="kbLinks">Ссылки (по одной в строке)</label>
+                            <textarea id="kbLinks" rows="3" class="textarea-small" placeholder="https://..."></textarea>
+                            <div class="hint">Можно добавить ссылки на документацию, Confluence, Notion и т.п.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="kbFiles">Файлы (до 5)</label>
+                            <input type="file" id="kbFiles" multiple />
+                            <div class="hint">PDF, DOCX, TXT, XLSX — пока используются как контекст, без предпросмотра.</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="field">
-                    <label for="kbLinks">Ссылки (по одной в строке)</label>
-                    <textarea id="kbLinks" rows="3" class="textarea-small" placeholder="https://..."></textarea>
-                    <div class="hint">Можно добавить ссылки на документацию, Confluence, Notion и т.п.</div>
-                </div>
-
-                <div class="field">
-                    <label for="kbFiles">Файлы (до 5)</label>
-                    <input type="file" id="kbFiles" multiple />
-                    <div class="hint">PDF, DOCX, TXT, XLSX — пока используются как контекст, без предпросмотра.</div>
-                </div>
 
                 <div class="field">
                     <label>Что включать в генерацию</label>
