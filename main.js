@@ -4,6 +4,9 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
 
   const feature = document.getElementById("feature").value;
   const extraInfo = document.getElementById("extraInfo").value;
+  const modeEl = document.querySelector('input[name="mode"]:checked');
+  const mode = modeEl ? modeEl.value : "mvp"; // дефолт — mvp
+
 
   const kbLinks = document
     .getElementById("kbLinks")
@@ -24,6 +27,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
     kbLinks,
     kbFiles,
     language: document.getElementById("language").value,
+    mode,
     include: {
       questions: document.getElementById("incQuestions").checked,
       acceptanceCriteria: document.getElementById("incAC").checked,
