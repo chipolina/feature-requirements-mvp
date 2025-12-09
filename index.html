@@ -275,7 +275,8 @@
 
         /* Обычные абзацы в результате */
         #result p {
-            margin: 4px 0 8px;
+            margin: 6px 0 10px;
+            line-height: 1.45;
         }
 
         /* Таблица тест-кейсов */
@@ -283,6 +284,13 @@
             border-collapse: collapse;
             width: 100%;
             margin: 16px 0 12px;
+        }
+
+        #result h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 28px; /* ровно “две строки” */
+            margin-bottom: 8px; /* одна строка снизу */
         }
 
         #result th,
@@ -303,7 +311,16 @@
         #result td:first-child {
             font-weight: 600;
         }
+        #result p:empty,
+        #result p:blank {
+            margin: 4px 0 !important; /* аккуратный маленький отступ */
+            height: 8px; /* создаёт одну “визуальную” строку */
+        }
 
+        #result p:has(br:only-child) {
+            margin: 4px 0 !important;
+            height: 8px;
+        }
 
         #downloadBtn {
             background: linear-gradient(135deg, #4f46e5, #6366f1);
