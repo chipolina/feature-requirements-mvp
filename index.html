@@ -265,6 +265,61 @@
             max-width: 240px;
             min-width: 200px;
         }
+
+        .toggle-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        }
+
+        .toggle-label {
+        font-size: 14px;
+        color: #4b5563;
+        }
+
+        .switch {
+        position: relative;
+        display: inline-block;
+        width: 46px;
+        height: 24px;
+        }
+
+        .switch input { 
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0;
+        right: 0; bottom: 0;
+        background-color: #d1d5db;
+        border-radius: 24px;
+        transition: .25s;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px; 
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        border-radius: 50%;
+        transition: .25s;
+        }
+
+        input:checked + .slider {
+        background-color: #6366f1; /* фиолетовый */
+        }
+
+        input:checked + .slider:before {
+        transform: translateX(22px);
+        }
+
                 /* Заголовки разделов внутри результата */
         #result h3 {
             font-size: 15px;
@@ -442,18 +497,21 @@
                         </select>
                     </div>
                     <div class="field">
-                        <span>Режим анализа</span>
-                        <div class="mode-toggle">
-                            <label>
-                            <input type="radio" name="mode" value="mvp" checked />
-                            Стандартный (MVP)
+                   <div class="field">
+                        <label for="analysisModeToggle">Режим анализа</label>
+
+                        <div class="toggle-wrap">
+                            <span class="toggle-label">Стандартный (MVP)</span>
+
+                            <label class="switch">
+                            <input id="analysisModeToggle" type="checkbox">
+                            <span class="slider"></span>
                             </label>
-                            <label>
-                            <input type="radio" name="mode" value="enterprise-lite" />
-                            Enterprise-lite
-                            </label>
+
+                            <span class="toggle-label">Enterprise</span>
                         </div>
-                        </div>
+                    </div>
+
                     <div style="flex: 1;"></div>
                     <button type="submit" class="btn-primary">
                         Сгенерировать

@@ -4,8 +4,9 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
 
   const feature = document.getElementById("feature").value;
   const extraInfo = document.getElementById("extraInfo").value;
-  const modeEl = document.querySelector('input[name="mode"]:checked');
-  const mode = modeEl ? modeEl.value : "mvp"; // дефолт — mvp
+  const enterpriseToggle = document.getElementById("analysisModeToggle");
+  const mode = enterpriseToggle.checked ? "enterprise-lite" : "mvp";
+
 
 
   const kbLinks = document
