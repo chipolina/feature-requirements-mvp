@@ -395,22 +395,46 @@
 
         <!-- Правая колонка: результат + уточнения + фидбек -->
         <div>
+            <!-- ===== РЕЗУЛЬТАТ ===== -->
             <section class="card">
+
                 <div class="card-header">
                     <div>
                         <div class="card-title">Результат</div>
-                        <div class="card-subtitle">Ответ ИИ в markdown-формате (его можно сразу копировать в ТЗ).</div>
+                        <div class="card-subtitle">
+                            Ответ ИИ в markdown-формате (его можно сразу копировать в ТЗ).
+                        </div>
                     </div>
+
                     <button id="regenerateBtn" class="btn-ghost" style="display:none;">
                         Сгенерировать ещё раз
                     </button>
                 </div>
 
+                <!-- Ответ -->
                 <div id="result">Пока пусто — введите описание фичи и запустите генерацию.</div>
 
-                <!-- Сохранение результата в файл -->
-                <div class="field" style="margin-top: 12px;">
+
+                <!-- ===== ДОП. ИНФОРМАЦИЯ ===== -->
+                <div class="field" style="margin-top: 20px;">
+                    <label for="extraInfo">Дополнительная информация / ответы на уточняющие вопросы</label>
+
+                    <textarea id="extraInfo" placeholder="После первого прогона сюда можно вписать ответы на уточняющие вопросы или дополнительные детали по фиче."></textarea>
+
+                    <div class="hint">Эта информация будет учитываться при следующей генерации.</div>
+
+                    <div style="margin-top: 8px; display:flex; justify-content:flex-end;">
+                        <button type="button" id="clarifyBtn" class="btn-secondary" style="display:none;">
+                            Уточнить
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА ===== -->
+                <div class="field" style="margin-top: 20px;">
                     <label>Сохранить результат</label>
+
                     <div class="inline-controls">
                         <select id="fileFormat" class="select-compact">
                             <option value="md">Markdown (.md)</option>
@@ -418,42 +442,43 @@
                             <option value="word">Word (MVP: .txt)</option>
                             <option value="pdf">PDF (MVP: .txt)</option>
                             <option value="xlsx">Excel (MVP: .txt)</option>
-                    </select>
-                    <button type="button" id="downloadBtn" class="btn-secondary">
-                        Сохранить файл
-                    </button>
-                    <div class="hint">
-                        Имя файла = название фичи. Для Word/PDF/Excel в текущем MVP сохраняется текстовый файл (.txt).
-                    </div>
+                        </select>
 
-
-                <!-- Уточняющие вопросы / доп. информация -->
-                <div class="field" style="margin-top: 8px;">
-                    <label for="extraInfo">Дополнительная информация / ответы на уточняющие вопросы</label>
-                    <textarea id="extraInfo" placeholder="После первого прогона сюда можно вписать ответы на уточняющие вопросы или дополнительные детали по фиче."></textarea>
-                    <div class="hint">Эта информация будет учитываться при следующей генерации.</div>
-                    <div style="margin-top: 8px; display:flex; justify-content:flex-end;">
-                        <button type="button" id="clarifyBtn" class="btn-secondary" style="display:none;">
-                            Уточнить
+                        <button type="button" id="downloadBtn" class="btn-secondary">
+                            Сохранить файл
                         </button>
                     </div>
+
+                    <div class="hint">
+                        Имя файла = название фичи.  
+                        Для Word/PDF/Excel в текущем MVP сохраняется текстовый файл (.txt).
+                    </div>
                 </div>
+
             </section>
 
+
+
+            <!-- ===== ОБРАТНАЯ СВЯЗЬ ===== -->
             <section class="card">
+
                 <div class="card-header">
                     <div>
                         <div class="card-title">Обратная связь</div>
-                        <div class="card-subtitle">Помогает улучшать промпт и качество генерации.</div>
+                        <div class="card-subtitle">
+                            Помогает улучшать промпт и качество генерации.
+                        </div>
                     </div>
                 </div>
 
                 <form id="feedbackForm">
+
                     <div class="feedback-grid">
                         <div class="field">
                             <label for="rating">Оценка</label>
                             <input type="number" id="rating" min="1" max="5" class="rating-input" placeholder="1–5" />
                         </div>
+
                         <div class="field">
                             <label for="email">Email (необязательно)</label>
                             <input type="email" id="email" placeholder="Для связи по важным кейсам" />
@@ -470,9 +495,12 @@
                             Отправить фидбек
                         </button>
                     </div>
+
                 </form>
+
             </section>
         </div>
+
     </div>
 
     <footer>
