@@ -107,6 +107,21 @@ exports.handler = async (event) => {
   const openaiApiKey = process.env.OPENAI_API_KEY;
   const openaiModel = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
+  // Проверяем наличие обязательных переменных окружения
+  if (!airtableToken || !baseId) {
+    console.error("Missing Airtable config:", { 
+      hasToken: !!airtableToken, 
+      hasBaseId: !!baseId 
+    });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: "Airtable configuration missing",
+        details: "AIRTABLE_TOKEN или AIRTABLE_BASE_ID не установлены в переменных окружения"
+      }),
+    };
+  }
+
   let requestId = null;
 
   try {
@@ -125,7 +140,28 @@ exports.handler = async (event) => {
 
     const effectiveMode = mode === "enterprise-lite" ? "enterprise-lite" : "mvp";
 
-
+    // 0. Получаем контент из ссылок базы знаний (если включена опция)
+    let kbContent = "";
+    if (include.useKnowledgeBase && kbLinks && kbLinks.length > 0) {
+      console.log(`Fetching content from ${kbLinks.length} KB links...`);
+      try {
+        const kbTexts = await Promise.all(
+          kbLinks.map(async (url) => {
+            try {
+              const content = await fetchWebContent(url);
+              return `---\nИсточник: ${url}\n\n${content}\n---\n`;
+            } catch (err) {
+              console.error(`Failed to fetch ${url}:`, err.message);
+              return `---\nИсточник: ${url}\n\n[Не удалось получить содержимое: ${err.message}]\n---\n`;
+            }
+          })
+        );
+        kbContent = "\n\n" + kbTexts.join("\n\n");
+      } catch (err) {
+        console.error("Error fetching KB content:", err);
+        kbContent = "\n\n[Ошибка при получении содержимого базы знаний]";
+      }
+    }
 
     // 1. создаём запись в Airtable со статусом in_progress
     const fields = {
@@ -142,38 +178,65 @@ exports.handler = async (event) => {
       "Status": "in_progress",
     };
 
+    const apiUrl = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(requestsTable)}`;
+    console.log("Creating Airtable record:", { baseId, tableName: requestsTable, url: apiUrl });
 
-    const createRes = await fetch(
-      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(
-        requestsTable
-      )}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${airtableToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ fields }),
-      }
-    );
+    const createRes = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${airtableToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ fields }),
+    });
 
     const created = await createRes.json();
 
     if (!createRes.ok) {
-        console.error("Airtable create error:", created);
-    return {
+      console.error("Airtable create error:", {
+        status: createRes.status,
+        statusText: createRes.statusText,
+        response: created,
+        baseId,
+        tableName: requestsTable
+      });
+      
+      let errorDetails = "Неизвестная ошибка Airtable";
+      if (created.error === "NOT_FOUND") {
+        errorDetails = `Таблица "${requestsTable}" не найдена в базе "${baseId}". Проверьте имя таблицы и BASE_ID.`;
+      } else if (created.error === "UNAUTHORIZED") {
+        errorDetails = "Неверный токен доступа. Проверьте AIRTABLE_TOKEN.";
+      } else if (created.error) {
+        errorDetails = `Ошибка Airtable: ${created.error}`;
+      }
+      
+      return {
         statusCode: 500,
         body: JSON.stringify({
-        error: "Airtable create failed",
-        airtable: created   // <- тут будет точное сообщение Airtable
+          error: "Airtable create failed",
+          airtable: created,
+          details: errorDetails,
+          config: {
+            baseId: baseId ? `${baseId.substring(0, 8)}...` : "не установлен",
+            tableName: requestsTable
+          }
         }),
-    };
+      };
     }
 
 
     requestId = created.id;
 
     // 2. вызываем OpenAI
+    // Формируем промпт с учетом базы знаний
+    let userPrompt = feature;
+    if (extraInfo) {
+      userPrompt += "\n\nДополнительная информация:\n" + extraInfo;
+    }
+    if (kbContent) {
+      userPrompt += "\n\nБаза знаний (контекст для анализа):" + kbContent;
+    }
+
     const userPayload = {
         feature,
         extraInfo,
@@ -184,7 +247,6 @@ exports.handler = async (event) => {
         mode: effectiveMode,
         parentRequestId,
     };
-
 
     const openaiRes = await fetch(
       "https://api.openai.com/v1/chat/completions",
@@ -198,7 +260,7 @@ exports.handler = async (event) => {
           model: openaiModel,
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
-            { role: "user", content: JSON.stringify(userPayload) },
+            { role: "user", content: userPrompt },
           ],
         }),
       }
@@ -290,4 +352,51 @@ async function markRequestFailed(baseId, tableName, token, recordId) {
       }),
     }
   );
+}
+
+// Функция для получения текстового содержимого веб-страницы
+async function fetchWebContent(url) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд таймаут
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AI Requirements Generator/1.0)',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const html = await response.text();
+    
+    // Простой парсинг HTML для извлечения текста
+    // Убираем теги script, style, noscript
+    let text = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, '')
+      .replace(/<[^>]+>/g, ' ') // Убираем все оставшиеся HTML теги
+      .replace(/\s+/g, ' ') // Нормализуем пробелы
+      .trim();
+
+    // Ограничиваем размер контента (первые 8000 символов)
+    if (text.length > 8000) {
+      text = text.substring(0, 8000) + '... [содержимое обрезано]';
+    }
+
+    return text || '[Не удалось извлечь текстовое содержимое]';
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Превышено время ожидания при получении страницы');
+    }
+    throw new Error(`Ошибка при получении страницы: ${error.message}`);
+  }
 }

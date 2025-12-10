@@ -150,6 +150,72 @@
             transform: translateY(-4px);
         }
 
+        /* Контейнер для ввода ссылок */
+        .kb-links-container {
+            position: relative;
+        }
+
+        .kb-links-input {
+            width: 100%;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            padding: 9px 10px;
+            font: inherit;
+            font-size: 13px;
+            background: #f9fafb;
+        }
+
+        .kb-links-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-soft);
+            background: #ffffff;
+        }
+
+        .kb-links-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .kb-link-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: var(--accent-soft);
+            border-radius: 999px;
+            font-size: 12px;
+            color: #3730a3;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .kb-link-chip:hover {
+            background: rgba(79, 70, 229, 0.15);
+        }
+
+        .kb-link-chip a {
+            color: inherit;
+            text-decoration: none;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .kb-link-chip .remove {
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.6;
+            padding: 0 2px;
+        }
+
+        .kb-link-chip .remove:hover {
+            opacity: 1;
+        }
+
 
         .checkbox-group {
             display: grid;
@@ -173,7 +239,7 @@
 
         .toolbar {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 12px;
             margin-top: 12px;
@@ -237,7 +303,6 @@
             overflow: auto;
         }
 
-        #regenerateBtn { margin-top: 0; }
 
         .feedback-grid {
             display: grid;
@@ -267,14 +332,15 @@
         }
 
         .toggle-wrap {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 0;
         }
 
         .toggle-label {
-        font-size: 14px;
-        color: #4b5563;
+            font-size: 13px;
+            color: var(--text-muted);
         }
 
         .switch {
@@ -444,9 +510,17 @@
 
                     <div id="kbContent" class="kb-content">
                         <div class="field">
-                            <label for="kbLinks">Ссылки (по одной в строке)</label>
-                            <textarea id="kbLinks" rows="3" class="textarea-small" placeholder="https://..."></textarea>
-                            <div class="hint">Можно добавить ссылки на документацию, Confluence, Notion и т.п.</div>
+                            <label for="kbLinks">Ссылки</label>
+                            <div id="kbLinksContainer" class="kb-links-container">
+                                <input 
+                                    type="text" 
+                                    id="kbLinksInput" 
+                                    placeholder="Введите ссылку и нажмите Enter или запятую..."
+                                    class="kb-links-input"
+                                />
+                            </div>
+                            <div id="kbLinksList" class="kb-links-list"></div>
+                            <div class="hint">Можно добавить ссылки на документацию, Confluence, Notion и т.п. Ctrl+Click для открытия ссылки.</div>
                         </div>
 
                         <div class="field">
@@ -489,33 +563,32 @@
                 </div>
 
                 <div class="toolbar">
-                    <div>
+                    <div style="display: flex; flex-direction: column;">
                         <label for="language">Язык результата</label>
                         <select id="language">
                             <option value="RU">Русский</option>
                             <option value="EN">English</option>
                         </select>
                     </div>
-                    <div class="field">
-                   <div class="field">
-                        <label for="analysisModeToggle">Режим анализа</label>
-
-                        <div class="toggle-wrap">
-                            <span class="toggle-label">Стандартный (MVP)</span>
-
-                            <label class="switch">
-                            <input id="analysisModeToggle" type="checkbox">
-                            <span class="slider"></span>
-                            </label>
-
-                            <span class="toggle-label">Enterprise</span>
+                    <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="analysisModeToggle">Режим анализа</label>
+                            <div class="toggle-wrap">
+                                <span class="toggle-label">Стандартный (MVP)</span>
+                                <label class="switch">
+                                    <input id="analysisModeToggle" type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="toggle-label">Enterprise</span>
+                            </div>
                         </div>
                     </div>
-
-                    <div style="flex: 1;"></div>
-                    <button type="submit" class="btn-primary">
-                        Сгенерировать
-                    </button>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <label style="visibility: hidden;">&nbsp;</label>
+                        <button type="submit" class="btn-primary">
+                            Сгенерировать
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -532,10 +605,6 @@
                             Ответ ИИ в markdown-формате (его можно сразу копировать в ТЗ).
                         </div>
                     </div>
-
-                    <button id="regenerateBtn" class="btn-ghost" style="display:none;">
-                        Сгенерировать ещё раз
-                    </button>
                 </div>
 
                 <!-- Ответ -->
