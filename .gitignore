@@ -1,4 +1,7 @@
 # Local Netlify folder
 .netlify
 .env
+
+# Cursor IDE files
+.cursor/
 .cursor
