@@ -310,7 +310,24 @@
             gap: 10px;
         }
 
-        .rating-input { max-width: 80px; }
+        .rating-input { 
+            max-width: 200px;
+            min-width: 180px;
+        }
+
+        select.rating-input {
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: white;
+            font-size: 13px;
+            width: 100%;
+        }
+
+        #feedbackMessage {
+            font-size: 13px;
+            line-height: 1.5;
+        }
 
         footer {
             margin-top: 18px;
@@ -386,17 +403,35 @@
         transform: translateX(22px);
         }
 
-                /* Заголовки разделов внутри результата */
-        #result h3 {
-            font-size: 15px;
+        /* Заголовки разделов внутри результата - убираем пустые строки */
+        #result h1,
+        #result h2,
+        #result h3,
+        #result h4,
+        #result h5,
+        #result h6 {
             font-weight: 600;
-            margin-top: 24px;   /* ~2 строки сверху */
-            margin-bottom: 8px; /* ~1 строка снизу */
+            margin-top: 24px;
+            margin-bottom: 2px; /* Минимальный отступ, чтобы убрать пустые строки */
+        }
+
+        #result h3 {
+            font-size: 16px;
+        }
+
+        /* Убираем лишние отступы у первого элемента после заголовка */
+        #result h1 + *,
+        #result h2 + *,
+        #result h3 + *,
+        #result h4 + *,
+        #result h5 + *,
+        #result h6 + * {
+            margin-top: 0;
         }
 
         /* Обычные абзацы в результате */
         #result p {
-            margin: 6px 0 10px;
+            margin: 4px 0 8px;
             line-height: 1.45;
         }
 
@@ -404,7 +439,7 @@
         #result table {
             border-collapse: collapse;
             width: 100%;
-            margin: 16px 0 12px;
+            margin: 12px 0 8px;
         }
 
         #result h3 {
@@ -669,10 +704,19 @@
 
                 <form id="feedbackForm">
 
+                    <div id="feedbackMessage" style="display:none; padding:10px; margin-bottom:10px; border-radius:4px; background:#f0f9ff; border:1px solid #3b82f6; color:#1e40af;"></div>
+
                     <div class="feedback-grid">
                         <div class="field">
-                            <label for="rating">Оценка</label>
-                            <input type="number" id="rating" min="1" max="5" class="rating-input" placeholder="1–5" />
+                            <label for="rating">Оценка <span style="color:#ef4444;">*</span></label>
+                            <select id="rating" class="rating-input" required>
+                                <option value="">Выберите оценку</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
                         </div>
 
                         <div class="field">
