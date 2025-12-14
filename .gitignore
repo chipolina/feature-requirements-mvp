@@ -5,3 +5,7 @@
 # Cursor IDE files
 .cursor/
 .cursor
+
+node_modules/
+.DS_Store
+**/.DS_Store

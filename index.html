@@ -216,6 +216,44 @@
             opacity: 1;
         }
 
+        .kb-files-list { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .kb-file-remove:hover { filter: brightness(0.98); }
+        .kb-file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: #fff;
+
+            height: 44px;
+        }
+
+        .kb-file-name {
+            flex: 1 1 auto;
+            min-width: 0;
+
+            font-size: 14px;
+            color: #111827;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .kb-file-remove {
+            flex-shrink: 0;
+            border: none;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            cursor: pointer;
+        }
 
         .checkbox-group {
             display: grid;
@@ -395,6 +433,8 @@
         transition: .25s;
         }
 
+        
+
         input:checked + .slider {
         background-color: #6366f1; /* фиолетовый */
         }
@@ -477,6 +517,34 @@
             margin: 4px 0 !important;
             height: 8px;
         }
+        /* KB files list: показывать все файлы, длинные имена обрезаются в строке */
+        #kbFilesList {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+
+            max-height: none;
+            overflow: visible;
+        }
+
+        /* FIX: KB container must not clip children */
+        #kbContent,
+        .kb-content {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        /* иногда клипает сама карточка */
+        .kb-block,
+        .card,
+        .card-body {
+            overflow: visible !important;
+        }
+
+
+        
 
         #downloadBtn {
             background: linear-gradient(135deg, #4f46e5, #6366f1);
@@ -559,9 +627,16 @@
                         </div>
 
                         <div class="field">
-                            <label for="kbFiles">Файлы (до 5)</label>
-                            <input type="file" id="kbFiles" multiple />
-                            <div class="hint">PDF, DOCX, TXT, XLSX — пока используются как контекст, без предпросмотра.</div>
+                            <label for="kbFiles">Файлы базы знаний (PDF, DOCX, TXT, XLSX, MD)</label>
+                            <input
+                                id="kbFiles"
+                                type="file"
+                                multiple
+                                accept=".pdf,.docx,.txt,.xlsx,.md"
+                           />
+                            <div id="kbFilesList" class="kb-files-list"></div>
+
+                            <div class="hint">До 3 файлов, максимум 5 MB каждый.</div>
                         </div>
                     </div>
                 </div>
