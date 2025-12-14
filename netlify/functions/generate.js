@@ -179,6 +179,145 @@ useKnowledgeBase === false ИЛИ
 • Язык вывода определяется ТОЛЬКО параметром language из запроса.
 `.trim();
 
+// --- KB Files support (multipart/form-data) ---
+const Busboy = require("busboy");
+let mammoth, pdfParse, XLSX;
+try { mammoth = require("mammoth"); } catch {}
+try { pdfParse = require("pdf-parse"); } catch {}
+try { XLSX = require("xlsx"); } catch {}
+
+const KB_ALLOWED_EXT = [".pdf", ".docx", ".txt", ".xlsx", ".md"];
+const KB_MAX_FILES = 3;
+const KB_MAX_FILE_SIZE = 3 * 1024 * 1024; // 5MB per file (Airtable uploadAttachment limit)
+
+
+function safeJsonParse(value, fallback) {
+  try { return JSON.parse(value); } catch { return fallback; }
+}
+
+function kbGetExt(filename) {
+  const i = filename.lastIndexOf(".");
+  return i >= 0 ? filename.slice(i).toLowerCase() : "";
+}
+
+function parseMultipart(event) {
+  return new Promise((resolve, reject) => {
+    const contentType = event.headers["content-type"] || event.headers["Content-Type"];
+    if (!contentType || !contentType.includes("multipart/form-data")) {
+      return reject(new Error("Not multipart/form-data"));
+    }
+
+    const bb = Busboy({ headers: { "content-type": contentType } });
+    const fields = {};
+    const files = [];
+
+    bb.on("field", (name, val) => { fields[name] = val; });
+
+    bb.on("file", (name, file, info) => {
+      const filename = info.filename || "unknown";
+      const mimeType = info.mimeType || info.mime || "application/octet-stream";
+      const chunks = [];
+      let size = 0;
+
+      file.on("data", (d) => {
+        size += d.length;
+        if (size > KB_MAX_FILE_SIZE) {
+          // consume the stream to finish parsing, but ignore buffer
+          file.resume();
+          return;
+        }
+        chunks.push(d);
+      });
+
+      file.on("end", () => {
+        files.push({
+          fieldname: name,
+          filename,
+          mimeType,
+          size,
+          buffer: Buffer.concat(chunks),
+        });
+      });
+    });
+
+    bb.on("error", reject);
+    bb.on("finish", () => resolve({ fields, files }));
+
+    const body = event.isBase64Encoded
+      ? Buffer.from(event.body || "", "base64")
+      : Buffer.from(event.body || "", "utf8");
+
+    bb.end(body);
+  });
+}
+
+async function extractTextFromFile(file) {
+  const ext = kbGetExt(file.filename);
+
+  if (ext === ".txt" || ext === ".md") {
+    return file.buffer.toString("utf8");
+  }
+
+  if (ext === ".docx") {
+    if (!mammoth) return "[DOCX: не удалось извлечь текст (модуль mammoth не установлен)]";
+    const res = await mammoth.extractRawText({ buffer: file.buffer });
+    return res.value || "";
+  }
+
+  if (ext === ".pdf") {
+    if (!pdfParse) return "[PDF: не удалось извлечь текст (модуль pdf-parse не установлен)]";
+    const res = await pdfParse(file.buffer);
+    return res.text || "";
+  }
+
+  if (ext === ".xlsx") {
+    if (!XLSX) return "[XLSX: не удалось извлечь текст (модуль xlsx не установлен)]";
+    const wb = XLSX.read(file.buffer, { type: "buffer" });
+    const parts = [];
+    for (const sheetName of wb.SheetNames) {
+      const ws = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true });
+      parts.push(`### Sheet: ${sheetName}`);
+      const slice = rows.slice(0, 50);
+      for (const r of slice) {
+        parts.push((r || []).map((c) => String(c ?? "")).join("\t"));
+      }
+      parts.push("");
+    }
+    return parts.join("\n");
+  }
+
+  return "";
+}
+
+async function airtableUploadAttachment({ baseId, tableName, token, recordId, fieldName, file }) {
+  // Airtable endpoint: /{table}/{recordId}/{fieldName}/uploadAttachment
+  const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}/${recordId}/${encodeURIComponent(fieldName)}/uploadAttachment`;
+
+  const payload = {
+    contentType: file.mimeType || "application/octet-stream",
+    filename: file.filename,
+    file: file.buffer.toString("base64"),
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(`Airtable uploadAttachment failed: ${JSON.stringify(data).slice(0, 500)}`);
+  }
+  return data;
+}
+
+
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return {
@@ -213,21 +352,50 @@ exports.handler = async (event) => {
   const startTime = Date.now(); // Время начала обработки запроса
 
   try {
-    // Разбираем тело запроса ОДИН раз
-    const body = JSON.parse(event.body || "{}");
+    // Разбираем тело запроса (multipart preferred; JSON fallback)
+    const contentType = event.headers["content-type"] || event.headers["Content-Type"] || "";
 
-    const {
-      feature,
-      extraInfo = "",
-      kbLinks = [],
-      kbFiles = [],
-      language = "RU",
-      mode,
-      include = {},
-      parentRequestId = null,
-    } = body;
-    
-    // Получаем информацию о пользователе (если есть в headers)
+    let feature = "";
+    let extraInfo = "";
+    let kbLinks = [];
+    let kbFiles = []; // legacy (JSON) / meta
+    let language = "RU";
+    let mode;
+    let include = {};
+    let parentRequestId = null;
+
+    // Файлы KB (реальные байты) из multipart
+    let uploadedKbFiles = [];
+
+    if (contentType.includes("multipart/form-data")) {
+      const { fields: mpFields, files: mpFiles } = await parseMultipart(event);
+
+      feature = mpFields.feature || "";
+      extraInfo = mpFields.extraInfo || "";
+      language = mpFields.language || "RU";
+      mode = mpFields.mode;
+      parentRequestId = mpFields.parentRequestId || null;
+
+      kbLinks = safeJsonParse(mpFields.kbLinks, []);
+      include = safeJsonParse(mpFields.include, {});
+
+      uploadedKbFiles = (mpFiles || []).filter((f) => f.fieldname === "kbFiles");
+      // Для логов (и совместимости) формируем метаданные kbFiles
+      kbFiles = uploadedKbFiles.map((f) => ({ name: f.filename, size: f.size, type: f.mimeType }));
+    } else {
+      const body = JSON.parse(event.body || "{}");
+      ({
+        feature,
+        extraInfo = "",
+        kbLinks = [],
+        kbFiles = [],
+        language = "RU",
+        mode,
+        include = {},
+        parentRequestId = null,
+      } = body);
+    }
+// Получаем информацию о пользователе (если есть в headers)
     const userAgent = event.headers?.['user-agent'] || event.headers?.['User-Agent'] || 'unknown';
     const userInfo = userAgent.substring(0, 100); // Ограничиваем длину
 
@@ -248,6 +416,37 @@ exports.handler = async (event) => {
     // KB, которые реально пойдут в модель (если useKB = false — очищаем)
     const kbLinksForModel = useKB ? kbLinks : [];
     const kbFilesForModel = useKB ? kbFiles : [];
+
+    // --- KB Files: validate + upload artifacts to Airtable + extract text for model ---
+    let kbFilesText = "";
+    if (useKB && uploadedKbFiles && uploadedKbFiles.length > 0) {
+      // validate count
+      if (uploadedKbFiles.length > KB_MAX_FILES) {
+        return {
+          statusCode: 400,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ error: `Можно загрузить максимум ${KB_MAX_FILES} файлов.` }),
+        };
+      }
+
+      for (const f of uploadedKbFiles) {
+        const ext = kbGetExt(f.filename);
+        if (!KB_ALLOWED_EXT.includes(ext)) {
+          return {
+            statusCode: 400,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ error: `Недопустимый формат файла: ${f.filename}. Разрешены: ${KB_ALLOWED_EXT.join(", ")}` }),
+          };
+        }
+        if (f.size > KB_MAX_FILE_SIZE) {
+          return {
+            statusCode: 400,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ error: `Файл слишком большой: ${f.filename}. Макс размер: 5 MB.` }),
+          };
+        }
+      }
+    }
 
     // 0. Получаем контент из ссылок базы знаний (если включена опция и есть ссылки)
     let kbContent = "";
@@ -434,6 +633,62 @@ exports.handler = async (event) => {
       user: userInfo,
     });
 
+    // Загружаем KB файлы в Airtable как артефакты (Attachment field: "KB Files")
+    // и извлекаем текст для передачи в модель (учитывается аналогично ссылкам)
+    if (useKB && uploadedKbFiles && uploadedKbFiles.length > 0) {
+      const extractedParts = [];
+      for (const f of uploadedKbFiles) {
+        try {
+          await airtableUploadAttachment({
+            baseId,
+            tableName: requestsTable,
+            token: airtableToken,
+            recordId: requestId,
+            fieldName: "KB Files",
+            file: f,
+          });
+        } catch (e) {
+          console.error("Failed to upload KB file to Airtable:", { file: f.filename, error: e.message });
+          // Не валим генерацию полностью: продолжаем, но текст файла всё равно попробуем извлечь
+        }
+
+        try {
+          const text = await extractTextFromFile(f);
+          if (text && text.trim()) {
+            extractedParts.push(`---\nФайл: ${f.filename}\n\n${text.trim()}\n---`);
+          }
+        } catch (e) {
+          console.error("Failed to extract text from KB file:", { file: f.filename, error: e.message });
+        }
+      }
+
+      kbFilesText = extractedParts.join("\n\n");
+
+      // (Опционально) сохраняем извлечённый текст в Airtable (Long text field "KB Files Text")
+      if (kbFilesText) {
+        try {
+          await fetch(
+            `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(requestsTable)}/${requestId}`,
+            {
+              method: "PATCH",
+              headers: {
+                Authorization: `Bearer ${airtableToken}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                fields: {
+                  "KB Files Text": kbFilesText.substring(0, 100000),
+                },
+              }),
+            }
+          );
+        } catch (e) {
+          console.warn("Failed to save KB Files Text:", e.message);
+        }
+      }
+    }
+
+
     // Флаг для отслеживания таймаута
     let isTimedOut = false;
     
@@ -498,10 +753,10 @@ exports.handler = async (event) => {
     if (extraInfo) {
       userPrompt += `\n\nДополнительная информация:\n${extraInfo}`;
     }
-    if (kbContent) {
-      userPrompt +=
-        "\n\nБаза знаний (контекст для анализа, если она включена):" +
-        kbContent;
+    if (kbContent || kbFilesText) {
+      userPrompt += "\n\nБаза знаний (контекст для анализа, если она включена):";
+      if (kbContent) userPrompt += kbContent;
+      if (kbFilesText) userPrompt += "\n\n[KB файлы]\n" + kbFilesText;
     }
 
     // Вызываем OpenAI API (используется общий таймаут функции - 3 минуты)
