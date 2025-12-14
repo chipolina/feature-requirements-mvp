@@ -188,7 +188,35 @@ try { XLSX = require("xlsx"); } catch {}
 
 const KB_ALLOWED_EXT = [".pdf", ".docx", ".txt", ".xlsx", ".md"];
 const KB_MAX_FILES = 3;
-const KB_MAX_FILE_SIZE = 3 * 1024 * 1024; // 5MB per file (Airtable uploadAttachment limit)
+const KB_MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file (Airtable uploadAttachment limit)
+const airtableKbFilesField = process.env.AIRTABLE_KB_FILES_FIELD || "KB Files";
+
+async function uploadAttachmentToAirtable({ token, baseId, recordId, fieldName, file }) {
+  // ВАЖНО: uploadAttachment идёт через content.airtable.com и путь БЕЗ tableName
+  const url = `https://content.airtable.com/v0/${baseId}/${recordId}/${encodeURIComponent(fieldName)}/uploadAttachment`;
+
+  const payload = {
+    filename: file.filename,
+    contentType: file.mimeType || "application/octet-stream",
+    file: file.buffer.toString("base64"),
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(`Airtable uploadAttachment failed (${res.status}): ${JSON.stringify(data)}`);
+  }
+  return data;
+}
+
 
 
 function safeJsonParse(value, fallback) {
@@ -288,32 +316,6 @@ async function extractTextFromFile(file) {
   }
 
   return "";
-}
-
-async function airtableUploadAttachment({ baseId, tableName, token, recordId, fieldName, file }) {
-  // Airtable endpoint: /{table}/{recordId}/{fieldName}/uploadAttachment
-  const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}/${recordId}/${encodeURIComponent(fieldName)}/uploadAttachment`;
-
-  const payload = {
-    contentType: file.mimeType || "application/octet-stream",
-    filename: file.filename,
-    file: file.buffer.toString("base64"),
-  };
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(`Airtable uploadAttachment failed: ${JSON.stringify(data).slice(0, 500)}`);
-  }
-  return data;
 }
 
 
@@ -639,14 +641,7 @@ exports.handler = async (event) => {
       const extractedParts = [];
       for (const f of uploadedKbFiles) {
         try {
-          await airtableUploadAttachment({
-            baseId,
-            tableName: requestsTable,
-            token: airtableToken,
-            recordId: requestId,
-            fieldName: "KB Files",
-            file: f,
-          });
+          await uploadAttachmentToAirtable({ token: airtableToken, baseId, recordId: requestId, fieldName: airtableKbFilesField, file: f });
         } catch (e) {
           console.error("Failed to upload KB file to Airtable:", { file: f.filename, error: e.message });
           // Не валим генерацию полностью: продолжаем, но текст файла всё равно попробуем извлечь
@@ -901,9 +896,12 @@ exports.handler = async (event) => {
       };
     }
 
-    const markdown =
+    const rawMarkdown =
       openaiData.choices?.[0]?.message?.content?.trim() ||
       "Модель вернула пустой ответ.";
+
+    const markdown = normalizeMarkdown(rawMarkdown);
+
 
     // Вычисляем время генерации в секундах
     const endTime = Date.now();
@@ -927,40 +925,28 @@ exports.handler = async (event) => {
       status: "done",
     });
 
+    
+    // 3. обновляем запись в Airtable результатом
     try {
-      const updateRes = await fetch(
-        `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(
-          requestsTable
-        )}/${requestId}`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${airtableToken}`,
-            "Content-Type": "application/json",
+      const updateUrl = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(requestsTable)}/${requestId}`;
+      const updateRes = await fetch(updateUrl, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${airtableToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fields: {
+            "Result Markdown": markdownForAirtable,
+            "Status": "done",
+            "Generation Time (seconds)": generationTimeSeconds,
           },
-          body: JSON.stringify({
-            fields: {
-              "Result Markdown": markdownForAirtable,
-              Status: "done",
-              "Generation Time (seconds)": generationTimeSeconds,
-            },
-          }),
-        }
-      );
+        }),
+      });
 
-      const responseText = await updateRes.text();
-      let updateData;
-      
-      try {
-        updateData = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error("Airtable update response is not JSON:", responseText.substring(0, 200));
-        // Не прерываем выполнение, так как результат уже получен
-        console.warn(
-          "Не удалось распарсить ответ Airtable, но результат получен успешно"
-        );
-        updateData = { error: "Invalid JSON response" };
-      }
+      const updateText = await updateRes.text();
+      let updateData = {};
+      try { updateData = JSON.parse(updateText); } catch {}
 
       if (!updateRes.ok) {
         console.error("Airtable update error:", {
@@ -968,14 +954,8 @@ exports.handler = async (event) => {
           statusText: updateRes.statusText,
           response: updateData,
           requestId,
-          markdownLength: markdown.length,
         });
-
-        // Не прерываем выполнение, так как результат уже получен
-        // Просто логируем ошибку
-        console.warn(
-          "Не удалось обновить запись в Airtable, но результат получен успешно"
-        );
+        console.warn("Не удалось обновить запись в Airtable, но результат получен успешно");
       } else {
         console.log("Airtable record updated successfully:", {
           requestId,
@@ -985,13 +965,11 @@ exports.handler = async (event) => {
       }
     } catch (updateError) {
       console.error("Airtable update fetch error:", updateError);
-      // Не прерываем выполнение, так как результат уже получен
-      console.warn(
-        "Не удалось обновить запись в Airtable из-за сетевой ошибки, но результат получен успешно"
-      );
+      console.warn("Не удалось обновить запись в Airtable из-за сетевой ошибки, но результат получен успешно");
     }
 
     // 4. отдаём ответ фронту
+
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
@@ -1166,4 +1144,22 @@ async function fetchWebContent(url) {
       `Ошибка при получении страницы: ${error.message}`
     );
   }
+}
+
+function normalizeMarkdown(md) {
+  if (!md) return md;
+
+  let s = md;
+
+  // 1) Сжимаем "много пустых строк" до одной пустой строки между блоками
+  s = s.replace(/\n{3,}/g, "\n\n");
+
+  // 2) Убираем пустую строку сразу после заголовка (чтобы не было отступа "Блок\n\n-текст")
+  // Пример: "## Заголовок\n\nтекст" -> "## Заголовок\nтекст"
+  s = s.replace(/(\n#{1,6}\s+[^\n]+)\n\n+/g, "$1\n");
+
+  // 3) Если где-то получилось "пустая строка перед заголовком" — оставляем максимум одну
+  s = s.replace(/\n{2,}(?=\n#{1,6}\s)/g, "\n\n");
+
+  return s.trim();
 }
