@@ -51,24 +51,68 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
       body: JSON.stringify(payload),
     });
 
-    const data = await res.json();
+    // Получаем текст ответа для проверки формата
+    const responseText = await res.text();
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Response is not JSON:", responseText.substring(0, 200));
+      
+      let errorMessage = "Генерация не отработала";
+      let errorDetails = "Сервер вернул ответ в неожиданном формате";
+      
+      // Пытаемся определить тип ошибки по тексту ответа
+      const lowerText = responseText.toLowerCase();
+      if (lowerText.includes("timeout") || lowerText.includes("timed out") || lowerText.includes("task timed")) {
+        errorMessage = "Превышено время ожидания";
+        errorDetails = "Генерация требований заняла слишком много времени и была прервана. Попробуйте упростить описание фичи или повторить попытку позже.";
+      } else if (lowerText.includes("network") || lowerText.includes("connection")) {
+        errorMessage = "Ошибка сети";
+        errorDetails = "Не удалось установить соединение с сервером. Проверьте подключение к интернету и попробуйте снова.";
+      } else if (responseText.length > 0) {
+        errorDetails = `Сервер вернул: ${responseText.substring(0, 100)}`;
+      }
+      
+      document.getElementById("result").innerText = `${errorMessage}\n\n${errorDetails}`;
+      return;
+    }
 
     if (!res.ok) {
       // Обработка ошибок от сервера
-      let errorMessage = "Произошла ошибка при генерации.";
+      let errorMessage = "Генерация не отработала";
+      let errorDetails = "Произошла ошибка при генерации требований";
       
       if (data.error) {
-        errorMessage = `Ошибка: ${data.error}`;
+        errorMessage = data.error;
+      }
+      
+      if (data.details) {
+        errorDetails = data.details;
+      } else if (data.error && !data.details) {
+        errorDetails = data.error;
+      }
+      
+      // Специальная обработка ошибок Airtable
+      if (data.airtable && data.airtable.error) {
+        errorMessage = "Ошибка базы данных";
         
-        // Специальная обработка ошибок Airtable
-        if (data.airtable && data.airtable.error === "NOT_FOUND") {
-          errorMessage = "Ошибка конфигурации Airtable: база данных или таблица не найдены. Проверьте переменные окружения AIRTABLE_BASE_ID и AIRTABLE_REQUESTS_TABLE.";
-        } else if (data.airtable && data.airtable.error) {
-          errorMessage = `Ошибка Airtable: ${data.airtable.error}`;
+        // Правильно сериализуем ошибку Airtable
+        if (typeof data.airtable.error === "string") {
+          errorDetails = `Ошибка Airtable: ${data.airtable.error}`;
+        } else if (data.airtable.error === "NOT_FOUND") {
+          errorMessage = "Ошибка конфигурации";
+          errorDetails = "База данных или таблица не найдены. Обратитесь к администратору системы.";
+        } else if (data.airtable.error.type === "INVALID_VALUE_FOR_COLUMN") {
+          errorDetails = `Ошибка Airtable: ${data.airtable.error.message || "Неверное значение для колонки"}`;
+        } else {
+          // Если это объект, сериализуем его в JSON
+          errorDetails = `Ошибка Airtable: ${JSON.stringify(data.airtable.error)}`;
         }
       }
       
-      document.getElementById("result").innerText = errorMessage;
+      document.getElementById("result").innerText = `${errorMessage}\n\n${errorDetails}`;
       console.error("Server error:", data);
       return;
     }
@@ -93,7 +137,18 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
     document.getElementById("clarifyBtn").style.display = "inline-flex";
   } catch (err) {
     console.error("Fetch error:", err);
-    document.getElementById("result").innerText = `Ошибка сети: ${err.message}. Проверьте подключение к интернету и попробуйте снова.`;
+    
+    let errorMessage = "Генерация не отработала";
+    let errorDetails = "Произошла ошибка при отправке запроса";
+    
+    if (err.name === "TypeError" && err.message.includes("fetch")) {
+      errorMessage = "Ошибка сети";
+      errorDetails = "Не удалось установить соединение с сервером. Проверьте подключение к интернету и попробуйте снова.";
+    } else if (err.message) {
+      errorDetails = err.message;
+    }
+    
+    document.getElementById("result").innerText = `${errorMessage}\n\n${errorDetails}`;
   }
 });
 
@@ -105,24 +160,147 @@ document.getElementById("clarifyBtn").addEventListener("click", () => {
     .dispatchEvent(new Event("submit"));
 });
 
+// Функция валидации email
+function isValidEmail(email) {
+  if (!email || email.trim() === "") {
+    return true; // Пустой email допустим (необязательное поле)
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email.trim());
+}
+
 // Фидбек
-document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+const feedbackForm = document.getElementById("feedbackForm");
+const feedbackMessage = document.getElementById("feedbackMessage");
 
-  const payload = {
-    rating: Number(document.getElementById("rating").value),
-    comment: document.getElementById("comment").value,
-    email: document.getElementById("email").value,
-    requestId: window.lastRequestId || null,
-  };
-
-  await fetch("/api/feedback", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+// Запрещаем вставку изображений в textarea
+const commentField = document.getElementById("comment");
+if (commentField) {
+  commentField.addEventListener("paste", (e) => {
+    const items = e.clipboardData?.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          e.preventDefault();
+          feedbackMessage.textContent = "Вставка изображений не поддерживается. Пожалуйста, используйте только текст.";
+          feedbackMessage.style.display = "block";
+          feedbackMessage.style.background = "#fef2f2";
+          feedbackMessage.style.borderColor = "#ef4444";
+          feedbackMessage.style.color = "#991b1b";
+          setTimeout(() => {
+            feedbackMessage.style.display = "none";
+          }, 3000);
+          return;
+        }
+      }
+    }
   });
 
-  alert("Спасибо! Фидбек отправлен.");
+  // Также запрещаем drag & drop изображений
+  commentField.addEventListener("dragover", (e) => {
+    e.preventDefault();
+  });
+
+  commentField.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].type.startsWith("image/")) {
+          feedbackMessage.textContent = "Перетаскивание изображений не поддерживается. Пожалуйста, используйте только текст.";
+          feedbackMessage.style.display = "block";
+          feedbackMessage.style.background = "#fef2f2";
+          feedbackMessage.style.borderColor = "#ef4444";
+          feedbackMessage.style.color = "#991b1b";
+          setTimeout(() => {
+            feedbackMessage.style.display = "none";
+          }, 3000);
+          return;
+        }
+      }
+    }
+  });
+}
+
+feedbackForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const rating = document.getElementById("rating").value;
+  const comment = document.getElementById("comment").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const requestId = window.lastRequestId || null;
+
+  // Валидация рейтинга
+  if (!rating || rating === "") {
+    feedbackMessage.textContent = "Пожалуйста, выберите оценку.";
+    feedbackMessage.style.display = "block";
+    feedbackMessage.style.background = "#fef2f2";
+    feedbackMessage.style.borderColor = "#ef4444";
+    feedbackMessage.style.color = "#991b1b";
+    return;
+  }
+
+  // Валидация email
+  if (!isValidEmail(email)) {
+    feedbackMessage.textContent = "Пожалуйста, введите корректный email адрес или оставьте поле пустым.";
+    feedbackMessage.style.display = "block";
+    feedbackMessage.style.background = "#fef2f2";
+    feedbackMessage.style.borderColor = "#ef4444";
+    feedbackMessage.style.color = "#991b1b";
+    return;
+  }
+
+  // Показываем индикатор загрузки
+  const submitButton = feedbackForm.querySelector('button[type="submit"]');
+  const originalButtonText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = "Отправка...";
+
+  try {
+    const payload = {
+      rating: Number(rating),
+      comment: comment,
+      email: email || null,
+      requestId: requestId,
+    };
+
+    const res = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Ошибка при отправке фидбека");
+    }
+
+    // Успешная отправка
+    feedbackMessage.textContent = "Спасибо! Ваш фидбек успешно отправлен.";
+    feedbackMessage.style.display = "block";
+    feedbackMessage.style.background = "#f0fdf4";
+    feedbackMessage.style.borderColor = "#22c55e";
+    feedbackMessage.style.color = "#166534";
+
+    // Очищаем форму
+    feedbackForm.reset();
+
+    // Скрываем сообщение через 5 секунд
+    setTimeout(() => {
+      feedbackMessage.style.display = "none";
+    }, 5000);
+  } catch (err) {
+    feedbackMessage.textContent = `Ошибка: ${err.message}. Пожалуйста, попробуйте еще раз.`;
+    feedbackMessage.style.display = "block";
+    feedbackMessage.style.background = "#fef2f2";
+    feedbackMessage.style.borderColor = "#ef4444";
+    feedbackMessage.style.color = "#991b1b";
+    console.error("Feedback error:", err);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalButtonText;
+  }
 });
 
 // Сохранение результата в файл

@@ -4,6 +4,10 @@
 
 [functions]
   directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[functions.generate]
+  timeout = 300
 
 [[redirects]]
   from = "/api/generate"
