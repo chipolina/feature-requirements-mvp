@@ -134,7 +134,7 @@
         /* контейнер с анимацией высоты/прозрачности */
         .kb-content {
             overflow: hidden;
-            max-height: 260px; /* хватает на 2 поля */
+            max-height: 2000px; /* хватает на 2 поля */
             opacity: 1;
             transform: translateY(0);
             transition:
@@ -530,12 +530,6 @@
 
         /* FIX: KB container must not clip children */
         #kbContent,
-        .kb-content {
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-        }
-
         /* иногда клипает сама карточка */
         .kb-block,
         .card,
@@ -718,15 +712,6 @@
                         <div class="field">
                             <div class="label-row">
                             <label for="kbLinks">Ссылки</label>
-                            
-                            <span class="tooltip">
-                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                                <div class="tooltip-content">
-                                    <div class="tt-title">Ссылки</div>
-                                    <div>Дополнительный контекст (документация, Confluence, Notion и т.п.).</div>
-                                    <div style="margin-top:6px;">Используются только как источник фактов, без домыслов.</div>
-                                </div>
-                            </span>
                         </div>
                             <div id="kbLinksContainer" class="kb-links-container">
                                 <input 
@@ -743,15 +728,6 @@
                         <div class="field">
                             <div class="label-row">
                             <label for="kbFiles">Файлы базы знаний (PDF, DOCX, TXT, XLSX, MD)</label>
-                            
-                            <span class="tooltip">
-                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                                <div class="tooltip-content">
-                                    <div class="tt-title">Файлы</div>
-                                    <div>Используются как контекст при анализе.</div>
-                                    <div style="margin-top:6px;">Содержимое файлов не вставляется в результат напрямую.</div>
-                                </div>
-                            </span>
                         </div>
                             <input
                                 id="kbFiles"
@@ -864,7 +840,16 @@
 
                 <div class="toolbar">
                     <div style="display: flex; flex-direction: column;">
-                        <label for="language">Язык результата</label>
+                        <div class="label-row">
+    <label for="language">Язык результата</label>
+    <span class="tooltip">
+        <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+        <div class="tooltip-content">
+            <div class="tt-title">Язык результата</div>
+            <div class="tt-muted">Язык результата формируется на основе выбранного языка в настройках генерации.</div>
+        </div>
+    </span>
+</div>
                         <select id="language">
                             <option value="RU">Русский</option>
                             <option value="EN">English</option>

@@ -388,7 +388,8 @@ if (kbToggleBtn && kbContent) {
 
   document.querySelector(".kb-header").addEventListener("click", (e) => {
     if (e.target === kbToggleBtn) return;
-    kbCollapsed = !kbCollapsed;
+    if (e.target.closest && e.target.closest(".tooltip")) return;
+kbCollapsed = !kbCollapsed;
     kbContent.classList.toggle("kb-collapsed", kbCollapsed);
     updateKbToggleText();
   });
