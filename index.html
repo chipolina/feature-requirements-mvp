@@ -457,8 +457,6 @@
 
         #result h3 {
             font-size: 16px;
-            font-weight: 600;
-            margin: 12px 0 4px 0;
         }
 
         /* Убираем лишние отступы у первого элемента после заголовка */
@@ -576,6 +574,100 @@
         }
 
 
+    
+        /* ===== Tooltips (ⓘ) ===== */
+        .label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .label-row > label { margin: 0; }
+
+        .tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .tooltip-inline { margin-left: 8px; }
+
+        .info-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            background: var(--accent-soft);
+            color: #3730a3;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: help;
+            padding: 0;
+            user-select: none;
+        }
+        .info-icon:hover { background: rgba(79, 70, 229, 0.14); }
+        .info-icon:focus { outline: none; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18); }
+
+        .tooltip-content {
+            display: none;
+            position: absolute;
+            z-index: 50;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 280px;
+            max-width: 420px;
+            background: #ffffff;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 14px;
+            padding: 12px 12px;
+            box-shadow:
+                0 18px 45px rgba(15, 23, 42, 0.12),
+                0 0 0 1px rgba(148, 163, 184, 0.08);
+            color: var(--text-main);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .tooltip:hover .tooltip-content,
+        .tooltip:focus-within .tooltip-content {
+            display: block;
+        }
+
+        .tooltip-content .tt-title {
+            font-weight: 650;
+            margin: 0 0 6px 0;
+            font-size: 12.5px;
+        }
+        .tooltip-content .tt-muted { color: var(--text-muted); margin: 0 0 8px 0; }
+        .tooltip-content ul { margin: 6px 0 0 18px; padding: 0; }
+        .tooltip-content li { margin: 2px 0; }
+
+        /* Hover pointer for interactive items */
+        .checkbox-pill { cursor: pointer; }
+        .kb-header, .kb-toggle-btn { cursor: pointer; }
+
+        /* Pills layout with right-side tooltip icon */
+        .checkbox-pill {
+            justify-content: space-between;
+        }
+        .checkbox-pill .pill-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+        .checkbox-pill .pill-main span {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
     </style>
 </head>
 <body>
@@ -605,7 +697,16 @@
                 <div class="kb-block">
                     <div class="card-header kb-header">
                         <div>
-                            <div class="card-title">База знаний</div>
+                            <div class="card-title">База знаний
+                            <span class="tooltip">
+                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                                <div class="tooltip-content">
+                                    <div class="tt-title">База знаний</div>
+                                    <div class="tt-muted">Дополнительный контекст (документация, Confluence, Notion и т.п.). Используется только как источник фактов, без домыслов.</div>
+                                    <div><strong>Ссылки</strong> — добавляют контекст из внешних источников.</div>
+                                    <div style="margin-top:6px;"><strong>Файлы</strong> — используются как контекст при анализе. Содержимое файлов не вставляется в результат напрямую.</div>
+                                </div>
+                            </span></div>
                             <div class="card-subtitle">Опционально. Помогает согласовать фичу с текущим продуктом.</div>
                         </div>
                         <button type="button" id="kbToggle" class="btn-ghost kb-toggle-btn">
@@ -615,7 +716,18 @@
 
                     <div id="kbContent" class="kb-content">
                         <div class="field">
+                            <div class="label-row">
                             <label for="kbLinks">Ссылки</label>
+                            
+                            <span class="tooltip">
+                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                                <div class="tooltip-content">
+                                    <div class="tt-title">Ссылки</div>
+                                    <div>Дополнительный контекст (документация, Confluence, Notion и т.п.).</div>
+                                    <div style="margin-top:6px;">Используются только как источник фактов, без домыслов.</div>
+                                </div>
+                            </span>
+                        </div>
                             <div id="kbLinksContainer" class="kb-links-container">
                                 <input 
                                     type="text" 
@@ -629,7 +741,18 @@
                         </div>
 
                         <div class="field">
+                            <div class="label-row">
                             <label for="kbFiles">Файлы базы знаний (PDF, DOCX, TXT, XLSX, MD)</label>
+                            
+                            <span class="tooltip">
+                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                                <div class="tooltip-content">
+                                    <div class="tt-title">Файлы</div>
+                                    <div>Используются как контекст при анализе.</div>
+                                    <div style="margin-top:6px;">Содержимое файлов не вставляется в результат напрямую.</div>
+                                </div>
+                            </span>
+                        </div>
                             <input
                                 id="kbFiles"
                                 type="file"
@@ -645,32 +768,97 @@
 
 
                 <div class="field">
-                    <label>Что включать в генерацию</label>
+                    <div class="label-row">
+                        <label>Что включать в генерацию</label>
+                        
+                            <span class="tooltip">
+                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                                <div class="tooltip-content">
+                                    <div class="tt-title">Опции генерации</div>
+                                    <div>Выберите, какие блоки включать в итоговый результат.</div>
+                                    <div style="margin-top:6px;">Подсказки по каждому элементу — по иконке ⓘ справа.</div>
+                                </div>
+                            </span>
+                    </div>
                     <div class="checkbox-group">
                         <label class="checkbox-pill">
+                            <span class="pill-main">
                             <input type="checkbox" id="incQuestions" checked />
                             <span>Уточняющие вопросы</span>
-                        </label>
+                        </span>
+                        <span class="tooltip tooltip-inline">
+                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                            <div class="tooltip-content">
+                                <div class="tt-title">Уточняющие вопросы</div>
+                                <div>Вопросы, без которых нельзя корректно описать требования.</div>
+                            </div>
+                        </span>
+                    </label>
                         <label class="checkbox-pill">
+                            <span class="pill-main">
                             <input type="checkbox" id="incAC" checked />
                             <span>Acceptance Criteria</span>
-                        </label>
+                        </span>
+                        <span class="tooltip tooltip-inline">
+                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                            <div class="tooltip-content">
+                                <div class="tt-title">Acceptance Criteria</div>
+                                <div>Формализованные условия приёмки фичи.</div>
+                            </div>
+                        </span>
+                    </label>
                         <label class="checkbox-pill">
+                            <span class="pill-main">
                             <input type="checkbox" id="incTC" checked />
                             <span>Тест-кейсы</span>
-                        </label>
+                        </span>
+                        <span class="tooltip tooltip-inline">
+                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                            <div class="tooltip-content">
+                                <div class="tt-title">Тест-кейсы</div>
+                                <div>Базовые сценарии проверки требований.</div>
+                            </div>
+                        </span>
+                    </label>
                         <label class="checkbox-pill">
+                            <span class="pill-main">
                             <input type="checkbox" id="incNeg" checked />
                             <span>Негативные сценарии</span>
-                        </label>
+                        </span>
+                        <span class="tooltip tooltip-inline">
+                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                            <div class="tooltip-content">
+                                <div class="tt-title">Негативные и граничные сценарии</div>
+                                <div>Ошибки и крайние случаи.</div>
+                            </div>
+                        </span>
+                    </label>
                         <label class="checkbox-pill">
+                            <span class="pill-main">
                             <input type="checkbox" id="incOOS" checked />
                             <span>Out of Scope</span>
-                        </label>
+                        </span>
+                        <span class="tooltip tooltip-inline">
+                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                            <div class="tooltip-content">
+                                <div class="tt-title">Out of Scope</div>
+                                <div>То, что не входит в текущую реализацию.</div>
+                            </div>
+                        </span>
+                    </label>
                         <label class="checkbox-pill">
+                            <span class="pill-main">
                             <input type="checkbox" id="useKB" checked />
                             <span>Использовать базу знаний</span>
-                        </label>
+                        </span>
+                        <span class="tooltip tooltip-inline">
+                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                            <div class="tooltip-content">
+                                <div class="tt-title">Использовать базу знаний</div>
+                                <div>Подключает ссылки и файлы как контекст при анализе. Используется только как источник фактов, без домыслов.</div>
+                            </div>
+                        </span>
+                    </label>
                     </div>
                 </div>
 
@@ -684,7 +872,33 @@
                     </div>
                     <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
                         <div style="display: flex; flex-direction: column;">
-                            <label for="analysisModeToggle">Режим анализа</label>
+                            <div class="label-row">
+                                <label for="analysisModeToggle">Режим анализа</label>
+                                
+                            <span class="tooltip">
+                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
+                                <div class="tooltip-content">
+                                    <div class="tt-title">Режим анализа</div>
+                                    <div>Режим анализа определяет глубину и строгость генерации требований.</div>
+                                    <div style="margin-top:6px;">Система использует только данные из описания и базы знаний, не дополняя функциональность без подтверждения.</div>
+                                    <div style="margin-top:10px;"><strong>Стандартный (MVP)</strong></div>
+                                    <ul>
+                                        <li>Краткое и практичное ТЗ</li>
+                                        <li>Фокус на ключевых требованиях</li>
+                                        <li>Минимум уточняющих вопросов</li>
+                                        <li>Подходит для быстрого анализа и MVP</li>
+                                    </ul>
+                                    <div style="margin-top:10px;"><strong>Enterprise</strong></div>
+                                    <ul>
+                                        <li>Более строгий и детализированный анализ</li>
+                                        <li>Риски и граничные сценарии</li>
+                                        <li>Больше уточняющих вопросов</li>
+                                        <li>Подходит для сложных фич</li>
+                                    </ul>
+                                    <div style="margin-top:10px;" class="tt-muted">Язык результата формируется на основе выбранного языка в настройках генерации.</div>
+                                </div>
+                            </span>
+                            </div>
                             <div class="toggle-wrap">
                                 <span class="toggle-label">Стандартный (MVP)</span>
                                 <label class="switch">
