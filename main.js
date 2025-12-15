@@ -1,138 +1,18 @@
 
-function kbEscapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-// --- KB Files (client-side): list, validate, remove, prevent duplicates ---
-const KB_ALLOWED_EXT = [".pdf", ".docx", ".txt", ".xlsx", ".md"];
-const KB_MAX_FILES = 3;
-const KB_MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB per file
-
-let selectedKbFiles = [];
-
-function kbGetExt(filename) {
-  const i = filename.lastIndexOf(".");
-  return i >= 0 ? filename.slice(i).toLowerCase() : "";
-}
-
-function kbFileKey(f) {
-  return `${f.name}__${f.size}__${f.lastModified || 0}`;
-}
-
-function kbValidateFiles(files) {
-  const list = Array.from(files || []);
-  if (list.length > KB_MAX_FILES) {
-    return `Можно загрузить максимум ${KB_MAX_FILES} файлов.`;
+// --- Tooltip icons: do not toggle checkboxes when clicking ⓘ inside labels ---
+document.addEventListener("mousedown", (e) => {
+  if (e.target && e.target.closest && e.target.closest(".info-icon")) {
+    e.preventDefault();
+    e.stopPropagation();
   }
-  for (const f of list) {
-    const ext = kbGetExt(f.name);
-    if (!KB_ALLOWED_EXT.includes(ext)) {
-      return `Недопустимый формат: ${f.name}. Разрешены: ${KB_ALLOWED_EXT.join(", ")}`;
-    }
-    if (f.size > KB_MAX_FILE_SIZE) {
-      return `Файл слишком большой: ${f.name}. Макс размер: 5 MB.`;
-    }
+}, true);
+
+document.addEventListener("click", (e) => {
+  if (e.target && e.target.closest && e.target.closest(".info-icon")) {
+    e.preventDefault();
+    e.stopPropagation();
   }
-  return null;
-}
-
-function syncInputFilesFromSelected() {
-  const input = document.getElementById("kbFiles");
-  if (!input) return;
-  const dt = new DataTransfer();
-  for (const f of selectedKbFiles) dt.items.add(f);
-  input.files = dt.files;
-}
-
-function renderKbFilesList() {
-  const listEl = document.getElementById("kbFilesList");
-  if (!listEl) return;
-
-  if (!selectedKbFiles.length) {
-    listEl.innerHTML = "";
-    return;
-  }
-
-  listEl.innerHTML = selectedKbFiles
-    .map((f, idx) => {
-      const safeName = kbEscapeHtml(f.name);
-      return `
-        <div class="kb-file-item" title="${safeName}">
-          <div class="kb-file-name" title="${safeName}">${safeName}</div>
-          <button type="button" class="kb-file-remove" data-kb-remove="${idx}">Удалить</button>
-        </div>
-      `;
-    })
-    .join("");
-
-  listEl.querySelectorAll("[data-kb-remove]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const i = Number(e.currentTarget.getAttribute("data-kb-remove"));
-      selectedKbFiles.splice(i, 1);
-      syncInputFilesFromSelected();  // важно: синхронизируем native input.files
-      renderKbFilesList();
-    });
-  });
-}
-
-function setupKbFilesInput() {
-  const input = document.getElementById("kbFiles");
-  if (!input) return;
-
-  input.addEventListener("change", (e) => {
-    const newFiles = Array.from(e.target.files || []);
-    if (!newFiles.length) return;
-
-    const existing = new Set(selectedKbFiles.map(kbFileKey));
-    const uniqueNew = [];
-    const duplicates = [];
-
-    for (const f of newFiles) {
-      const key = kbFileKey(f);
-      if (existing.has(key)) {
-        duplicates.push(f.name);
-      } else {
-        uniqueNew.push(f);
-        existing.add(key);
-      }
-    }
-
-    if (duplicates.length) {
-      alert(`Файл уже добавлен: ${duplicates.join(", ")}`);
-    }
-
-    const merged = [...selectedKbFiles, ...uniqueNew];
-    const err = kbValidateFiles(merged);
-    if (err) {
-      alert(err);
-      // очищаем текущее действие выбора
-      e.target.value = "";
-      return;
-    }
-
-    selectedKbFiles = merged;
-
-    // Обновляем input.files и список
-    syncInputFilesFromSelected();
-    renderKbFilesList();
-
-    // сброс value, чтобы повторный выбор того же файла снова триггерил change
-    e.target.value = "";
-    // и ещё раз синхронизируем после сброса (на некоторых браузерах value может сбросить files)
-    syncInputFilesFromSelected();
-  });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  setupKbFilesInput();
-  renderKbFilesList();
-});
-
+}, true);
 
 // Генерация
 document.getElementById("generateForm").addEventListener("submit", async (e) => {
@@ -149,21 +29,13 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
   const kbLinksElements = document.querySelectorAll(".kb-link-chip a");
   const kbLinks = Array.from(kbLinksElements).map(el => el.href);
 
-    const kbFilesInput = document.getElementById("kbFiles");
-  const filesForSend = (selectedKbFiles && selectedKbFiles.length)
-    ? selectedKbFiles
-    : Array.from(kbFilesInput?.files || []);
-const kbFileError = kbValidateFiles(filesForSend);
-  if (kbFileError) {
-    document.getElementById("result").innerText = `Ошибка: ${kbFileError}`;
-    return;
-  }
-
-  const kbFiles = Array.from(filesForSend).map((f) => ({
+  const kbFilesInput = document.getElementById("kbFiles");
+  const kbFiles = Array.from(kbFilesInput.files).map((f) => ({
     name: f.name,
     size: f.size,
     type: f.type,
   }));
+
   const payload = {
     feature,
     extraInfo,
@@ -189,24 +61,10 @@ const kbFileError = kbValidateFiles(filesForSend);
   document.getElementById("result").innerText = "Генерация...";
 
   try {
-    // Формируем multipart/form-data (нужно для отправки файлов)
-    const formData = new FormData();
-    formData.append("feature", payload.feature || "");
-    formData.append("extraInfo", payload.extraInfo || "");
-    formData.append("language", payload.language || "RU");
-    formData.append("mode", payload.mode || "mvp");
-    formData.append("include", JSON.stringify(payload.include || {}));
-    formData.append("kbLinks", JSON.stringify(payload.kbLinks || []));
-    if (payload.parentRequestId) formData.append("parentRequestId", payload.parentRequestId);
-
-    // Реальные файлы
-    for (const file of filesForSend) {
-      formData.append("kbFiles", file, file.name);
-    }
-
     const res = await fetch("/api/generate", {
       method: "POST",
-      body: formData, // ⚠️ Content-Type не задаём вручную
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
 
     // Получаем текст ответа для проверки формата
@@ -530,7 +388,8 @@ if (kbToggleBtn && kbContent) {
 
   document.querySelector(".kb-header").addEventListener("click", (e) => {
     if (e.target === kbToggleBtn) return;
-    kbCollapsed = !kbCollapsed;
+    if (e.target.closest && e.target.closest(".tooltip")) return;
+kbCollapsed = !kbCollapsed;
     kbContent.classList.toggle("kb-collapsed", kbCollapsed);
     updateKbToggleText();
   });
