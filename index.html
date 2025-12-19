@@ -304,9 +304,10 @@
             box-shadow: 0 10px 20px rgba(79, 70, 229, 0.30);
         }
         .btn-primary:hover {
-            transform: translateY(-0.5px);
-            box-shadow: 0 14px 24px rgba(79, 70, 229, 0.36);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+            transform: translateY(-1px);
         }
+
 
         .btn-secondary {
             background: #eef2ff;
@@ -537,14 +538,10 @@
             overflow: visible !important;
         }
 
-
-        
-
         #downloadBtn {
             background: linear-gradient(135deg, #4f46e5, #6366f1);
             color: #ffffff;
             box-shadow: 0 10px 22px rgba(79, 70, 229, 0.4);
-            animation: pulse-download 1.8s ease-in-out infinite;
         }
 
         #downloadBtn:hover {
@@ -573,11 +570,16 @@
         .label-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 6px;
+            justify-content: flex-start; /* важно: не space-between */
+            gap: 10px; 
         }
         .label-row > label { margin: 0; }
+
+        .label-row .tooltip{
+            margin-left: 0;   /* если было auto — убираем */
+            flex: 0 0 auto;
+        }
+
 
         .tooltip {
             position: relative;
@@ -746,7 +748,6 @@
                 <div class="field">
                     <div class="label-row">
                         <label>Что включать в генерацию</label>
-                        
                             <span class="tooltip">
                                 <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
                                 <div class="tooltip-content">
@@ -931,7 +932,7 @@
                     <div class="hint">Эта информация будет учитываться при следующей генерации.</div>
 
                     <div style="margin-top: 8px; display:flex; justify-content:flex-end;">
-                        <button type="button" id="clarifyBtn" class="btn-secondary" style="display:none;">
+                        <button type="button" id="clarifyBtn" class="btn-primary" style="display:none;">
                             Уточнить
                         </button>
                     </div>
@@ -951,7 +952,7 @@
                             <option value="xlsx">Excel (MVP: .txt)</option>
                         </select>
 
-                        <button type="button" id="downloadBtn" class="btn-secondary">
+                        <button type="button" id="downloadBtn" class="btn-primary">
                             Сохранить файл
                         </button>
                     </div>
@@ -1002,12 +1003,48 @@
                     </div>
 
                     <div class="field">
-                        <label for="comment">Комментарий</label>
-                        <textarea id="comment" placeholder="Что было полезно, что не понравилось, что добавить?"></textarea>
+                        <label for="wouldUse">Ты бы стал(а) использовать это в реальной работе? Почему да / нет?</label>
+                        <select id="wouldUse" class="select-compact" style="max-width: 220px; margin-bottom: 8px;">
+                            <option value="">Не выбрано</option>
+                            <option value="Да">Да</option>
+                            <option value="Нет">Нет</option>
+                            <option value="Не уверен(а)">Не уверен(а)</option>
+                        </select>
+                        <textarea id="wouldUseWhy" placeholder="Почему да / нет?" style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="manualWork">Что пришлось бы сильно допиливать руками?</label>
+                        <textarea id="manualWork" placeholder="Опиши, что именно пришлось бы править/дополнять" style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="extra">Что лишнее?</label>
+                        <textarea id="extra" placeholder="Что убрать/упростить" style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="whereManual">Где ты сейчас делаешь это вручную?</label>
+                        <textarea id="whereManual" placeholder="Инструменты/процессы: Notion, Confluence, Jira, Docs и т.п." style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="wontPayFor">За что точно не стал(а) бы платить?</label>
+                        <textarea id="wontPayFor" placeholder="Что не имеет ценности/не стоит денег" style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="wouldBeUpset">Если завтра сервис закроется — ты расстроишься?</label>
+                        <select id="wouldBeUpset" class="select-compact" style="max-width: 220px;">
+                            <option value="">Не выбрано</option>
+                            <option value="Да">Да</option>
+                            <option value="Нет">Нет</option>
+                            <option value="Не уверен(а)">Не уверен(а)</option>
+                        </select>
                     </div>
 
                     <div style="display:flex; justify-content:flex-end; gap:8px; align-items:center;">
-                        <button type="submit" class="btn-secondary">
+                        <button type="submit" class="btn-primary">
                             Отправить фидбек
                         </button>
                     </div>
