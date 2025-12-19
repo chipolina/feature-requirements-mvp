@@ -1,3 +1,28 @@
+## Deploy to Railway
+
+This project is configured to run on Railway as a regular Node/Express service (no Netlify Functions).
+
+### Local run
+
+```bash
+npm install
+npm start
+```
+
+Open: http://localhost:3000
+
+### Railway
+
+- Connect repo in Railway
+- Set env vars (OPENAI_API_KEY, AIRTABLE_*)
+- Deploy
+
+Healthcheck: `/health`
+
+
+
+---
+
 # feature-requirements-mvp
 
 ## Локальная разработка

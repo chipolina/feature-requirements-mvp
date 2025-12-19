@@ -1,3 +1,6 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 const SYSTEM_PROMPT = `
 Ты — AI Requirements & QA Analyst, работающий внутри сервиса AI Requirements Generator (MVP).
 Твоя задача — формализовывать требования, выявлять неясности, формировать Acceptance Criteria, тест-кейсы, риски и ограничения на основе:
@@ -320,7 +323,7 @@ async function extractTextFromFile(file) {
 
 
 
-exports.handler = async (event) => {
+export async function handler(event) {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
