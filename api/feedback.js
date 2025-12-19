@@ -1,4 +1,4 @@
-exports.handler = async (event) => {
+export async function handler(event) {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
