@@ -15,6 +15,131 @@ document.addEventListener("click", (e) => {
 }, true);
 
 // Генерация
+
+
+// --- Knowledge Base files (max 3, max 5MB each): show list + allow remove + validations ---
+const kbFilesInputEl = document.getElementById("kbFiles");
+const kbFilesListEl = document.getElementById("kbFilesList");
+
+const KB_MAX_FILES = 3;
+const KB_MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+
+// We keep our own list so user can add files in несколько заходов (не перетирая предыдущий выбор).
+let kbSelectedFiles = [];
+
+function kbFilesKey(f) {
+  return `${f.name}__${f.size}__${f.lastModified}`;
+}
+
+function syncKbInputFiles() {
+  const dt = new DataTransfer();
+  kbSelectedFiles.forEach((f) => dt.items.add(f));
+  kbFilesInputEl.files = dt.files;
+}
+
+function renderKbFiles() {
+  if (!kbFilesListEl) return;
+  kbFilesListEl.innerHTML = "";
+
+  kbSelectedFiles.forEach((file, idx) => {
+    const row = document.createElement("div");
+    row.className = "kb-file-item";
+
+    const name = document.createElement("div");
+    name.className = "kb-file-name";
+    name.title = file.name;
+    name.textContent = file.name;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "kb-file-remove";
+    btn.textContent = "Удалить";
+    btn.addEventListener("click", () => {
+      kbSelectedFiles.splice(idx, 1);
+      syncKbInputFiles();
+      renderKbFiles();
+    });
+
+    row.appendChild(name);
+    row.appendChild(btn);
+    kbFilesListEl.appendChild(row);
+  });
+}
+
+function notifyMaxFiles() {
+  alert("Можно добавить максимум 3 файла базы знаний.");
+}
+
+function notifyOversize(names) {
+  alert(`Файл(ы) превышают 5 MB и не будут добавлены:\n- ${names.join("\n- ")}`);
+}
+
+function notifyDuplicates(names) {
+  alert(`Файл уже загружен и не будет добавлен повторно:\n- ${names.join("\n- ")}`);
+}
+
+function validateAndInitFromInput() {
+  const initial = Array.from(kbFilesInputEl?.files || []);
+  const oversize = initial.filter((f) => f.size > KB_MAX_SIZE_BYTES).map((f) => f.name);
+  const valid = initial.filter((f) => f.size <= KB_MAX_SIZE_BYTES);
+
+  if (oversize.length) notifyOversize(oversize);
+
+  kbSelectedFiles = valid.slice(0, KB_MAX_FILES);
+  if (valid.length > KB_MAX_FILES) notifyMaxFiles();
+
+  syncKbInputFiles();
+  renderKbFiles();
+}
+
+if (kbFilesInputEl) {
+  kbFilesInputEl.addEventListener("change", () => {
+    const newlyPicked = Array.from(kbFilesInputEl.files || []);
+
+    const map = new Map(kbSelectedFiles.map((f) => [kbFilesKey(f), f]));
+
+    const duplicateNames = [];
+    const oversizeNames = [];
+    let maxReached = false;
+
+    for (const f of newlyPicked) {
+      if (f.size > KB_MAX_SIZE_BYTES) {
+        oversizeNames.push(f.name);
+        continue;
+      }
+
+      const key = kbFilesKey(f);
+      if (map.has(key)) {
+        duplicateNames.push(f.name);
+        continue;
+      }
+
+      if (map.size >= KB_MAX_FILES) {
+        maxReached = true;
+        continue;
+      }
+
+      map.set(key, f);
+    }
+
+    kbSelectedFiles = Array.from(map.values());
+
+    // Notifications (one per type)
+    if (maxReached) notifyMaxFiles();
+    if (oversizeNames.length) notifyOversize(oversizeNames);
+    if (duplicateNames.length) notifyDuplicates(duplicateNames);
+
+    syncKbInputFiles();
+    renderKbFiles();
+  });
+}
+
+// Initial render (in case browser restores input state)
+try {
+  validateAndInitFromInput();
+} catch (_) {}
+
+
 document.getElementById("generateForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
