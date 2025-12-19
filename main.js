@@ -174,7 +174,6 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
       testCases: document.getElementById("incTC").checked,
       negativeScenarios: document.getElementById("incNeg").checked,
       outOfScope: document.getElementById("incOOS").checked,
-      useKnowledgeBase: document.getElementById("useKB").checked,
     },
     parentRequestId:
       (window.isRegeneration || window.isClarification) && window.lastRequestId
@@ -186,11 +185,33 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
   document.getElementById("result").innerText = "Генерация...";
 
   try {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    let res;
+    if (kbSelectedFiles && kbSelectedFiles.length > 0) {
+      const fd = new FormData();
+      fd.append("feature", payload.feature || "");
+      fd.append("extraInfo", payload.extraInfo || "");
+      fd.append("language", payload.language || "RU");
+      if (payload.mode) fd.append("mode", payload.mode);
+      if (payload.parentRequestId) fd.append("parentRequestId", payload.parentRequestId);
+
+      // Передаём массивы/объекты как JSON-строки (сервер ожидает строку и парсит)
+      fd.append("kbLinks", JSON.stringify(payload.kbLinks || []));
+      fd.append("include", JSON.stringify(payload.include || {}));
+
+      // KB файлы: ключ должен быть ровно "kbFiles"
+      kbSelectedFiles.forEach((f) => fd.append("kbFiles", f, f.name));
+
+      res = await fetch("/api/generate", {
+        method: "POST",
+        body: fd,
+      });
+    } else {
+      res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    }
 
     // Получаем текст ответа для проверки формата
     const responseText = await res.text();
