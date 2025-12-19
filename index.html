@@ -822,19 +822,7 @@
                             </div>
                         </span>
                     </label>
-                        <label class="checkbox-pill">
-                            <span class="pill-main">
-                            <input type="checkbox" id="useKB" checked />
-                            <span>Использовать базу знаний</span>
-                        </span>
-                        <span class="tooltip tooltip-inline">
-                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                            <div class="tooltip-content">
-                                <div class="tt-title">Использовать базу знаний</div>
-                                <div>Подключает ссылки и файлы как контекст при анализе. Используется только как источник фактов, без домыслов.</div>
-                            </div>
-                        </span>
-                    </label>
+                        <!-- Опция "Использовать базу знаний" удалена: KB применяется автоматически, если добавлены ссылки/файлы -->
                     </div>
                 </div>
 
@@ -1002,8 +990,44 @@
                     </div>
 
                     <div class="field">
-                        <label for="comment">Комментарий</label>
-                        <textarea id="comment" placeholder="Что было полезно, что не понравилось, что добавить?"></textarea>
+                        <label for="wouldUse">Ты бы стал(а) использовать это в реальной работе? Почему да / нет?</label>
+                        <select id="wouldUse" class="select-compact" style="max-width: 220px; margin-bottom: 8px;">
+                            <option value="">Не выбрано</option>
+                            <option value="Да">Да</option>
+                            <option value="Нет">Нет</option>
+                            <option value="Не уверен(а)">Не уверен(а)</option>
+                        </select>
+                        <textarea id="wouldUseWhy" placeholder="Почему да / нет?" style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="manualWork">Что пришлось бы сильно допиливать руками?</label>
+                        <textarea id="manualWork" placeholder="Опиши, что именно пришлось бы править/дополнять" style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="extra">Что лишнее?</label>
+                        <textarea id="extra" placeholder="Что убрать/упростить" style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="whereManual">Где ты сейчас делаешь это вручную?</label>
+                        <textarea id="whereManual" placeholder="Инструменты/процессы: Notion, Confluence, Jira, Docs и т.п." style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="wontPayFor">За что точно не стал(а) бы платить?</label>
+                        <textarea id="wontPayFor" placeholder="Что не имеет ценности/не стоит денег" style="min-height: 90px;"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="wouldBeUpset">Если завтра сервис закроется — ты расстроишься?</label>
+                        <select id="wouldBeUpset" class="select-compact" style="max-width: 220px;">
+                            <option value="">Не выбрано</option>
+                            <option value="Да">Да</option>
+                            <option value="Нет">Нет</option>
+                            <option value="Не уверен(а)">Не уверен(а)</option>
+                        </select>
                     </div>
 
                     <div style="display:flex; justify-content:flex-end; gap:8px; align-items:center;">

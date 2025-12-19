@@ -174,7 +174,6 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
       testCases: document.getElementById("incTC").checked,
       negativeScenarios: document.getElementById("incNeg").checked,
       outOfScope: document.getElementById("incOOS").checked,
-      useKnowledgeBase: document.getElementById("useKB").checked,
     },
     parentRequestId:
       (window.isRegeneration || window.isClarification) && window.lastRequestId
@@ -186,11 +185,33 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
   document.getElementById("result").innerText = "Генерация...";
 
   try {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    let res;
+    if (kbSelectedFiles && kbSelectedFiles.length > 0) {
+      const fd = new FormData();
+      fd.append("feature", payload.feature || "");
+      fd.append("extraInfo", payload.extraInfo || "");
+      fd.append("language", payload.language || "RU");
+      if (payload.mode) fd.append("mode", payload.mode);
+      if (payload.parentRequestId) fd.append("parentRequestId", payload.parentRequestId);
+
+      // Передаём массивы/объекты как JSON-строки (сервер ожидает строку и парсит)
+      fd.append("kbLinks", JSON.stringify(payload.kbLinks || []));
+      fd.append("include", JSON.stringify(payload.include || {}));
+
+      // KB файлы: ключ должен быть ровно "kbFiles"
+      kbSelectedFiles.forEach((f) => fd.append("kbFiles", f, f.name));
+
+      res = await fetch("/api/generate", {
+        method: "POST",
+        body: fd,
+      });
+    } else {
+      res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    }
 
     // Получаем текст ответа для проверки формата
     const responseText = await res.text();
@@ -314,62 +335,70 @@ function isValidEmail(email) {
 const feedbackForm = document.getElementById("feedbackForm");
 const feedbackMessage = document.getElementById("feedbackMessage");
 
-// Запрещаем вставку изображений в textarea
-const commentField = document.getElementById("comment");
-if (commentField) {
-  commentField.addEventListener("paste", (e) => {
+// Запрещаем вставку/перетаскивание изображений в feedback textarea
+function lockTextareaImages(textareaEl) {
+  if (!textareaEl) return;
+
+  textareaEl.addEventListener("paste", (e) => {
     const items = e.clipboardData?.items;
-    if (items) {
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf("image") !== -1) {
-          e.preventDefault();
-          feedbackMessage.textContent = "Вставка изображений не поддерживается. Пожалуйста, используйте только текст.";
-          feedbackMessage.style.display = "block";
-          feedbackMessage.style.background = "#fef2f2";
-          feedbackMessage.style.borderColor = "#ef4444";
-          feedbackMessage.style.color = "#991b1b";
-          setTimeout(() => {
-            feedbackMessage.style.display = "none";
-          }, 3000);
-          return;
-        }
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type && items[i].type.indexOf("image") !== -1) {
+        e.preventDefault();
+        feedbackMessage.textContent =
+          "Вставка изображений не поддерживается. Пожалуйста, используйте только текст.";
+        feedbackMessage.style.display = "block";
+        feedbackMessage.style.background = "#fef2f2";
+        feedbackMessage.style.borderColor = "#ef4444";
+        feedbackMessage.style.color = "#991b1b";
+        setTimeout(() => {
+          feedbackMessage.style.display = "none";
+        }, 3000);
+        return;
       }
     }
   });
 
-  // Также запрещаем drag & drop изображений
-  commentField.addEventListener("dragover", (e) => {
-    e.preventDefault();
-  });
-
-  commentField.addEventListener("drop", (e) => {
+  textareaEl.addEventListener("dragover", (e) => e.preventDefault());
+  textareaEl.addEventListener("drop", (e) => {
     e.preventDefault();
     const files = e.dataTransfer?.files;
-    if (files) {
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].type.startsWith("image/")) {
-          feedbackMessage.textContent = "Перетаскивание изображений не поддерживается. Пожалуйста, используйте только текст.";
-          feedbackMessage.style.display = "block";
-          feedbackMessage.style.background = "#fef2f2";
-          feedbackMessage.style.borderColor = "#ef4444";
-          feedbackMessage.style.color = "#991b1b";
-          setTimeout(() => {
-            feedbackMessage.style.display = "none";
-          }, 3000);
-          return;
-        }
+    if (!files) return;
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].type && files[i].type.startsWith("image/")) {
+        feedbackMessage.textContent =
+          "Перетаскивание изображений не поддерживается. Пожалуйста, используйте только текст.";
+        feedbackMessage.style.display = "block";
+        feedbackMessage.style.background = "#fef2f2";
+        feedbackMessage.style.borderColor = "#ef4444";
+        feedbackMessage.style.color = "#991b1b";
+        setTimeout(() => {
+          feedbackMessage.style.display = "none";
+        }, 3000);
+        return;
       }
     }
   });
 }
 
+["wouldUseWhy", "manualWork", "extra", "whereManual", "wontPayFor"].forEach((id) => {
+  lockTextareaImages(document.getElementById(id));
+});
+
 feedbackForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const rating = document.getElementById("rating").value;
-  const comment = document.getElementById("comment").value.trim();
   const email = document.getElementById("email").value.trim();
   const requestId = window.lastRequestId || null;
+
+  const wouldUse = document.getElementById("wouldUse")?.value || "";
+  const wouldUseWhy = document.getElementById("wouldUseWhy")?.value?.trim() || "";
+  const manualWork = document.getElementById("manualWork")?.value?.trim() || "";
+  const extra = document.getElementById("extra")?.value?.trim() || "";
+  const whereManual = document.getElementById("whereManual")?.value?.trim() || "";
+  const wontPayFor = document.getElementById("wontPayFor")?.value?.trim() || "";
+  const wouldBeUpset = document.getElementById("wouldBeUpset")?.value || "";
 
   // Валидация рейтинга
   if (!rating || rating === "") {
@@ -400,9 +429,15 @@ feedbackForm.addEventListener("submit", async (e) => {
   try {
     const payload = {
       rating: Number(rating),
-      comment: comment,
       email: email || null,
       requestId: requestId,
+      wouldUse,
+      wouldUseWhy,
+      manualWork,
+      extra,
+      whereManual,
+      wontPayFor,
+      wouldBeUpset,
     };
 
     const res = await fetch("/api/feedback", {
