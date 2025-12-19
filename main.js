@@ -314,62 +314,70 @@ function isValidEmail(email) {
 const feedbackForm = document.getElementById("feedbackForm");
 const feedbackMessage = document.getElementById("feedbackMessage");
 
-// Запрещаем вставку изображений в textarea
-const commentField = document.getElementById("comment");
-if (commentField) {
-  commentField.addEventListener("paste", (e) => {
+// Запрещаем вставку/перетаскивание изображений в feedback textarea
+function lockTextareaImages(textareaEl) {
+  if (!textareaEl) return;
+
+  textareaEl.addEventListener("paste", (e) => {
     const items = e.clipboardData?.items;
-    if (items) {
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf("image") !== -1) {
-          e.preventDefault();
-          feedbackMessage.textContent = "Вставка изображений не поддерживается. Пожалуйста, используйте только текст.";
-          feedbackMessage.style.display = "block";
-          feedbackMessage.style.background = "#fef2f2";
-          feedbackMessage.style.borderColor = "#ef4444";
-          feedbackMessage.style.color = "#991b1b";
-          setTimeout(() => {
-            feedbackMessage.style.display = "none";
-          }, 3000);
-          return;
-        }
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type && items[i].type.indexOf("image") !== -1) {
+        e.preventDefault();
+        feedbackMessage.textContent =
+          "Вставка изображений не поддерживается. Пожалуйста, используйте только текст.";
+        feedbackMessage.style.display = "block";
+        feedbackMessage.style.background = "#fef2f2";
+        feedbackMessage.style.borderColor = "#ef4444";
+        feedbackMessage.style.color = "#991b1b";
+        setTimeout(() => {
+          feedbackMessage.style.display = "none";
+        }, 3000);
+        return;
       }
     }
   });
 
-  // Также запрещаем drag & drop изображений
-  commentField.addEventListener("dragover", (e) => {
-    e.preventDefault();
-  });
-
-  commentField.addEventListener("drop", (e) => {
+  textareaEl.addEventListener("dragover", (e) => e.preventDefault());
+  textareaEl.addEventListener("drop", (e) => {
     e.preventDefault();
     const files = e.dataTransfer?.files;
-    if (files) {
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].type.startsWith("image/")) {
-          feedbackMessage.textContent = "Перетаскивание изображений не поддерживается. Пожалуйста, используйте только текст.";
-          feedbackMessage.style.display = "block";
-          feedbackMessage.style.background = "#fef2f2";
-          feedbackMessage.style.borderColor = "#ef4444";
-          feedbackMessage.style.color = "#991b1b";
-          setTimeout(() => {
-            feedbackMessage.style.display = "none";
-          }, 3000);
-          return;
-        }
+    if (!files) return;
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].type && files[i].type.startsWith("image/")) {
+        feedbackMessage.textContent =
+          "Перетаскивание изображений не поддерживается. Пожалуйста, используйте только текст.";
+        feedbackMessage.style.display = "block";
+        feedbackMessage.style.background = "#fef2f2";
+        feedbackMessage.style.borderColor = "#ef4444";
+        feedbackMessage.style.color = "#991b1b";
+        setTimeout(() => {
+          feedbackMessage.style.display = "none";
+        }, 3000);
+        return;
       }
     }
   });
 }
 
+["wouldUseWhy", "manualWork", "extra", "whereManual", "wontPayFor"].forEach((id) => {
+  lockTextareaImages(document.getElementById(id));
+});
+
 feedbackForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const rating = document.getElementById("rating").value;
-  const comment = document.getElementById("comment").value.trim();
   const email = document.getElementById("email").value.trim();
   const requestId = window.lastRequestId || null;
+
+  const wouldUse = document.getElementById("wouldUse")?.value || "";
+  const wouldUseWhy = document.getElementById("wouldUseWhy")?.value?.trim() || "";
+  const manualWork = document.getElementById("manualWork")?.value?.trim() || "";
+  const extra = document.getElementById("extra")?.value?.trim() || "";
+  const whereManual = document.getElementById("whereManual")?.value?.trim() || "";
+  const wontPayFor = document.getElementById("wontPayFor")?.value?.trim() || "";
+  const wouldBeUpset = document.getElementById("wouldBeUpset")?.value || "";
 
   // Валидация рейтинга
   if (!rating || rating === "") {
@@ -400,9 +408,15 @@ feedbackForm.addEventListener("submit", async (e) => {
   try {
     const payload = {
       rating: Number(rating),
-      comment: comment,
       email: email || null,
       requestId: requestId,
+      wouldUse,
+      wouldUseWhy,
+      manualWork,
+      extra,
+      whereManual,
+      wontPayFor,
+      wouldBeUpset,
     };
 
     const res = await fetch("/api/feedback", {

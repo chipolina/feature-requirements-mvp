@@ -8,7 +8,18 @@ export async function handler(event) {
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const { rating, comment, email, requestId } = body;
+    const {
+      rating,
+      email,
+      requestId,
+      wouldUse,
+      wouldUseWhy,
+      manualWork,
+      extra,
+      whereManual,
+      wontPayFor,
+      wouldBeUpset,
+    } = body;
 
     // Валидация данных
     if (!rating || isNaN(rating) || rating < 1 || rating > 5) {
@@ -56,12 +67,56 @@ export async function handler(event) {
       };
     }
 
+    const allowedWouldUse = new Set(["Да", "Нет", "Не уверен(а)"]);
+    const allowedUpset = new Set(["Да", "Нет", "Не уверен(а)"]);
+    
     const fields = {
       "Rating": Number(rating),
-      "Comment": (comment || "").trim(),
       "Email": email ? email.trim() : "",
+    
+      // Тексты можно отправлять пустыми (или тоже опционально, как хочешь)
+      "Would Use Why": (wouldUseWhy || "").trim(),
+      "Manual Work": (manualWork || "").trim(),
+      "Extra": (extra || "").trim(),
+      "Where Manual": (whereManual || "").trim(),
+      "Wont Pay For": (wontPayFor || "").trim(),
     };
-
+    
+    // Single select — только если есть валидное значение
+    const wouldUseVal = (wouldUse || "").trim();
+    if (wouldUseVal) {
+      if (!allowedWouldUse.has(wouldUseVal)) {
+        return {
+          statusCode: 400,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            error: "Invalid wouldUse option",
+            details: `Допустимые значения: ${Array.from(allowedWouldUse).join(", ")}`
+          }),
+        };
+      }
+      fields["Would Use"] = wouldUseVal;
+    }
+    
+    const upsetVal = (wouldBeUpset || "").trim();
+    if (upsetVal) {
+      if (!allowedUpset.has(upsetVal)) {
+        return {
+          statusCode: 400,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            error: "Invalid wouldBeUpset option",
+            details: `Допустимые значения: ${Array.from(allowedUpset).join(", ")}`
+          }),
+        };
+      }
+      fields["Would Be Upset"] = upsetVal;
+    }
+    
+    if (requestId) {
+      fields["Request"] = [{ id: requestId }];
+    }
+    
     if (requestId) {
       fields["Request"] = [{ id: requestId }];
     }
@@ -131,9 +186,10 @@ export async function handler(event) {
 
     console.log("Feedback submitted successfully:", {
       rating: fields.Rating,
-      hasComment: !!fields.Comment,
       hasEmail: !!fields.Email,
       hasRequestId: !!requestId,
+      hasWouldUse: !!fields["Would Use"],
+      hasManualWork: !!fields["Manual Work"],
     });
 
     return {
