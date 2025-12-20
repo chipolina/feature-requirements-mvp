@@ -482,7 +482,6 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
     language: document.getElementById("language").value,
     mode,
     include: {
-      questions: document.getElementById("incQuestions").checked,
       acceptanceCriteria: document.getElementById("incAC").checked,
       testCases: document.getElementById("incTC").checked,
       negativeScenarios: document.getElementById("incNeg").checked,
