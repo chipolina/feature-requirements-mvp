@@ -578,7 +578,6 @@ export async function handler(event) {
       "Feature Description": featureDescription,
       "KB Links": kbLinksText,
       "Language": outputLanguage,
-      "Include Questions": !!include.questions,
       "Include Acceptance Criteria": !!include.acceptanceCriteria,
       "Include Test Cases": !!include.testCases,
       "Include Negative Scenarios": !!include.negativeScenarios,
