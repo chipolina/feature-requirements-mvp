@@ -664,13 +664,27 @@
             white-space: nowrap;
         }
 
+        /* UI language selector (fixed width so "English 🇬🇧" fits) */
+        .lang-select {
+            width: 170px;
+            min-width: 170px;
+            max-width: 170px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.15);
+            background: #fff;
+            font-size: 14px;
+            line-height: 20px;
+            white-space: nowrap;
+        }
+
     </style>
 </head>
 <body>
 <div class="page">
     <header>
-        <h1>AI Requirements Generator (MVP)</h1>
-        <p>Быстрая генерация требований, критериев приёмки и тест-кейсов на основе описания фичи и базы знаний.</p>
+        <h1 data-i18n="app_title">AI Requirements Generator (MVP)</h1>
+        <p data-i18n="app_subtitle">Fast generation of requirements, acceptance criteria and test cases based on the feature description and knowledge base.</p>
     </header>
 
     <div class="layout">
@@ -679,57 +693,56 @@
             <form id="generateForm" class="card">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">Описание фичи</div>
-                        <div class="card-subtitle">Это основной источник правды для анализа.</div>
+                        <div class="card-title" data-i18n="feature_title">Feature description</div>
+                        <div class="card-subtitle" data-i18n="feature_subtitle">This is the primary source of truth for the analysis.</div>
                     </div>
-                    <span class="badge">Шаг 1</span>
+                    <select id="uiLanguage" class="lang-select" aria-label="Interface language">
+                        <option value="en">English 🇬🇧</option>
+                        <option value="ru">Русский 🇷🇺</option>
+                    </select>
                 </div>
 
                 <div class="field">
-                    <textarea id="feature" required placeholder="Например: пользователь может устанавливать дедлайн для задачи..."></textarea>
+                    <textarea id="feature" required data-i18n-placeholder="feature_placeholder" placeholder="Example: the user can set a deadline for a task and get a reminder 24 hours before it."></textarea>
                 </div>
 
                 <!-- БЛОК БАЗЫ ЗНАНИЙ (collapsible) -->
                 <div class="kb-block">
                     <div class="card-header kb-header">
                         <div>
-                            <div class="card-title">База знаний
+                            <div class="card-title" data-i18n="kb_title">Knowledge base
                             <span class="tooltip">
-                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                                <div class="tooltip-content">
-                                    <div class="tt-title">База знаний</div>
-                                    <div class="tt-muted">Дополнительный контекст (документация, Confluence, Notion и т.п.). Используется только как источник фактов, без домыслов.</div>
-                                    <div><strong>Ссылки</strong> — добавляют контекст из внешних источников.</div>
-                                    <div style="margin-top:6px;"><strong>Файлы</strong> — используются как контекст при анализе. Содержимое файлов не вставляется в результат напрямую.</div>
-                                </div>
+                                <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                                <div class="tooltip-content" data-i18n-html="kb_tooltip_html"></div>
                             </span></div>
-                            <div class="card-subtitle">Опционально. Помогает согласовать фичу с текущим продуктом.</div>
+                            <div class="card-subtitle" data-i18n="kb_subtitle">Optional. Helps align the feature with the current product.</div>
                         </div>
                         <button type="button" id="kbToggle" class="btn-ghost kb-toggle-btn">
-                            Свернуть
+                            <span data-i18n="kb_collapse">Collapse</span>
                         </button>
                     </div>
 
                     <div id="kbContent" class="kb-content">
                         <div class="field">
                             <div class="label-row">
-                            <label for="kbLinks">Ссылки</label>
+                            <label for="kbLinks" data-i18n="links_label">Links</label>
                         </div>
                             <div id="kbLinksContainer" class="kb-links-container">
                                 <input 
                                     type="text" 
                                     id="kbLinksInput" 
-                                    placeholder="Введите ссылку и нажмите Enter или запятую..."
+                                    data-i18n-placeholder="links_placeholder"
+                                    placeholder="Enter a link and press Enter or comma..."
                                     class="kb-links-input"
                                 />
                             </div>
                             <div id="kbLinksList" class="kb-links-list"></div>
-                            <div class="hint">Можно добавить ссылки на документацию, Confluence, Notion и т.п. Ctrl+Click для открытия ссылки.</div>
+                            <div class="hint" data-i18n="links_hint">You can add links to docs, Confluence, Notion, etc. Use Ctrl+Click to open a link.</div>
                         </div>
 
                         <div class="field">
                             <div class="label-row">
-                            <label for="kbFiles">Файлы базы знаний (PDF, DOCX, TXT, XLSX, MD)</label>
+                            <label for="kbFiles" data-i18n="kb_files_label">Knowledge base files (PDF, DOCX, TXT, XLSX, MD)</label>
                         </div>
                             <input
                                 id="kbFiles"
@@ -739,7 +752,7 @@
                            />
                             <div id="kbFilesList" class="kb-files-list"></div>
 
-                            <div class="hint">До 3 файлов, максимум 5 MB каждый.</div>
+                            <div class="hint" data-i18n="kb_files_hint">Up to 3 files, max 5 MB each.</div>
                         </div>
                     </div>
                 </div>
@@ -747,80 +760,61 @@
 
                 <div class="field">
                     <div class="label-row">
-                        <label>Что включать в генерацию</label>
+                        <label data-i18n="include_label">What to include in generation</label>
                             <span class="tooltip">
-                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                                <div class="tooltip-content">
-                                    <div class="tt-title">Опции генерации</div>
-                                    <div>Выберите, какие блоки включать в итоговый результат.</div>
-                                    <div style="margin-top:6px;">Подсказки по каждому элементу — по иконке ⓘ справа.</div>
-                                </div>
+                                <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                                <div class="tooltip-content" data-i18n-html="include_tooltip_html"></div>
                             </span>
                     </div>
                     <div class="checkbox-group">
                         <label class="checkbox-pill">
                             <span class="pill-main">
                             <input type="checkbox" id="incQuestions" checked />
-                            <span>Уточняющие вопросы</span>
+                            <span data-i18n="inc_questions">Clarifying questions</span>
                         </span>
                         <span class="tooltip tooltip-inline">
-                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                            <div class="tooltip-content">
-                                <div class="tt-title">Уточняющие вопросы</div>
-                                <div>Вопросы, без которых нельзя корректно описать требования.</div>
-                            </div>
+                            <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                            <div class="tooltip-content" data-i18n-html="tt_questions_html"></div>
                         </span>
                     </label>
                         <label class="checkbox-pill">
                             <span class="pill-main">
                             <input type="checkbox" id="incAC" checked />
-                            <span>Acceptance Criteria</span>
+                            <span data-i18n="inc_ac">Acceptance Criteria</span>
                         </span>
                         <span class="tooltip tooltip-inline">
-                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                            <div class="tooltip-content">
-                                <div class="tt-title">Acceptance Criteria</div>
-                                <div>Формализованные условия приёмки фичи.</div>
-                            </div>
+                            <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                            <div class="tooltip-content" data-i18n-html="tt_ac_html"></div>
                         </span>
                     </label>
                         <label class="checkbox-pill">
                             <span class="pill-main">
                             <input type="checkbox" id="incTC" checked />
-                            <span>Тест-кейсы</span>
+                            <span data-i18n="inc_tc">Test cases</span>
                         </span>
                         <span class="tooltip tooltip-inline">
-                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                            <div class="tooltip-content">
-                                <div class="tt-title">Тест-кейсы</div>
-                                <div>Базовые сценарии проверки требований.</div>
-                            </div>
+                            <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                            <div class="tooltip-content" data-i18n-html="tt_tc_html"></div>
                         </span>
                     </label>
                         <label class="checkbox-pill">
                             <span class="pill-main">
                             <input type="checkbox" id="incNeg" checked />
-                            <span>Негативные сценарии</span>
+                            <span data-i18n="inc_neg">Negative scenarios</span>
                         </span>
                         <span class="tooltip tooltip-inline">
-                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                            <div class="tooltip-content">
-                                <div class="tt-title">Негативные и граничные сценарии</div>
-                                <div>Ошибки и крайние случаи.</div>
-                            </div>
+                            <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                            <div class="tooltip-content" data-i18n-html="tt_neg_html"></div>
                         </span>
                     </label>
                         <label class="checkbox-pill">
                             <span class="pill-main">
                             <input type="checkbox" id="incOOS" checked />
-                            <span>Out of Scope</span>
+                            <span data-i18n="inc_oos">Out of Scope</span>
                         </span>
                         <span class="tooltip tooltip-inline">
-                            <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                            <div class="tooltip-content">
-                                <div class="tt-title">Out of Scope</div>
-                                <div>То, что не входит в текущую реализацию.</div>
-                            </div>
+                            <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                            <div class="tooltip-content" data-i18n-html="tt_oos_html"></div>
                         </span>
                     </label>
                         <!-- Опция "Использовать базу знаний" удалена: KB применяется автоматически, если добавлены ссылки/файлы -->
@@ -830,64 +824,40 @@
                 <div class="toolbar">
                     <div style="display: flex; flex-direction: column;">
                         <div class="label-row">
-    <label for="language">Язык результата</label>
+    <label for="language" data-i18n="output_lang_label">Output language</label>
     <span class="tooltip">
-        <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-        <div class="tooltip-content">
-            <div class="tt-title">Язык результата</div>
-            <div class="tt-muted">Язык результата формируется на основе выбранного языка в настройках генерации.</div>
-        </div>
+        <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+        <div class="tooltip-content" data-i18n-html="output_lang_tooltip_html"></div>
     </span>
 </div>
                         <select id="language">
-                            <option value="RU">Русский</option>
                             <option value="EN">English</option>
+                            <option value="RU">Русский</option>
                         </select>
                     </div>
                     <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
                         <div style="display: flex; flex-direction: column;">
                             <div class="label-row">
-                                <label for="analysisModeToggle">Режим анализа</label>
+                                <label for="analysisModeToggle" data-i18n="analysis_mode_label">Analysis mode</label>
                                 
                             <span class="tooltip">
-                                <button type="button" class="info-icon" aria-label="Подсказка">ⓘ</button>
-                                <div class="tooltip-content">
-                                    <div class="tt-title">Режим анализа</div>
-                                    <div>Режим анализа определяет глубину и строгость генерации требований.</div>
-                                    <div style="margin-top:6px;">Система использует только данные из описания и базы знаний, не дополняя функциональность без подтверждения.</div>
-                                    <div style="margin-top:10px;"><strong>Стандартный (MVP)</strong></div>
-                                    <ul>
-                                        <li>Краткое и практичное ТЗ</li>
-                                        <li>Фокус на ключевых требованиях</li>
-                                        <li>Минимум уточняющих вопросов</li>
-                                        <li>Подходит для быстрого анализа и MVP</li>
-                                    </ul>
-                                    <div style="margin-top:10px;"><strong>Enterprise</strong></div>
-                                    <ul>
-                                        <li>Более строгий и детализированный анализ</li>
-                                        <li>Риски и граничные сценарии</li>
-                                        <li>Больше уточняющих вопросов</li>
-                                        <li>Подходит для сложных фич</li>
-                                    </ul>
-                                    <div style="margin-top:10px;" class="tt-muted">Язык результата формируется на основе выбранного языка в настройках генерации.</div>
-                                </div>
+                                <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                                <div class="tooltip-content" data-i18n-html="analysis_mode_tooltip_html"></div>
                             </span>
                             </div>
                             <div class="toggle-wrap">
-                                <span class="toggle-label">Стандартный (MVP)</span>
+                                <span class="toggle-label" data-i18n="analysis_mode_mvp">Standard (MVP)</span>
                                 <label class="switch">
                                     <input id="analysisModeToggle" type="checkbox">
                                     <span class="slider"></span>
                                 </label>
-                                <span class="toggle-label">Enterprise</span>
+                                <span class="toggle-label" data-i18n="analysis_mode_enterprise">Enterprise</span>
                             </div>
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: flex-end;">
                         <label style="visibility: hidden;">&nbsp;</label>
-                        <button type="submit" class="btn-primary">
-                            Сгенерировать
-                        </button>
+                        <button type="submit" class="btn-primary" data-i18n="btn_generate">Generate</button>
                     </div>
                 </div>
             </form>
@@ -900,28 +870,26 @@
 
                 <div class="card-header">
                     <div>
-                        <div class="card-title">Результат</div>
-                        <div class="card-subtitle">
-                            Ответ ИИ в markdown-формате (его можно сразу копировать в ТЗ).
-                        </div>
+                        <div class="card-title" data-i18n="result_title">Result</div>
+                        <div class="card-subtitle" data-i18n="result_subtitle">AI response in Markdown format (can be copied directly into a spec).</div>
                     </div>
                 </div>
 
                 <!-- Ответ -->
-                <div id="result">Пока пусто — введите описание фичи и запустите генерацию.</div>
+                <div id="result" data-i18n="result_empty">Empty so far — enter a feature description and run generation.</div>
 
 
                 <!-- ===== ДОП. ИНФОРМАЦИЯ ===== -->
                 <div class="field" style="margin-top: 20px;">
-                    <label for="extraInfo">Дополнительная информация / ответы на уточняющие вопросы</label>
+                    <label for="extraInfo" data-i18n="extra_label">Additional information / answers to clarifying questions</label>
 
-                    <textarea id="extraInfo" placeholder="После первого прогона сюда можно вписать ответы на уточняющие вопросы или дополнительные детали по фиче."></textarea>
+                    <textarea id="extraInfo" data-i18n-placeholder="extra_placeholder" placeholder="After the first run, you can add answers to clarifying questions or extra details here."></textarea>
 
-                    <div class="hint">Эта информация будет учитываться при следующей генерации.</div>
+                    <div class="hint" data-i18n="extra_hint">This information will be used in the next generation.</div>
 
                     <div style="margin-top: 8px; display:flex; justify-content:flex-end;">
                         <button type="button" id="clarifyBtn" class="btn-primary" style="display:none;">
-                            Уточнить
+                            <span data-i18n="btn_refine">Refine</span>
                         </button>
                     </div>
                 </div>
@@ -929,26 +897,21 @@
 
                 <!-- ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА ===== -->
                 <div class="field" style="margin-top: 20px;">
-                    <label>Сохранить результат</label>
+                    <label data-i18n="save_label">Save result</label>
 
                     <div class="inline-controls">
                         <select id="fileFormat" class="select-compact">
                             <option value="md">Markdown (.md)</option>
-                            <option value="txt">Текстовый файл (.txt)</option>
+                            <option value="txt" data-i18n="save_opt_txt">Text file (.txt)</option>
                             <option value="word">Word (MVP: .txt)</option>
                             <option value="pdf">PDF (MVP: .txt)</option>
                             <option value="xlsx">Excel (MVP: .txt)</option>
                         </select>
 
-                        <button type="button" id="downloadBtn" class="btn-primary">
-                            Сохранить файл
-                        </button>
+                        <button type="button" id="downloadBtn" class="btn-primary" data-i18n="save_btn">Save file</button>
                     </div>
 
-                    <div class="hint">
-                        Имя файла = название фичи.  
-                        Для Word/PDF/Excel в текущем MVP сохраняется текстовый файл (.txt).
-                    </div>
+                    <div class="hint" data-i18n="save_hint">File name = feature name. For Word/PDF/Excel in this MVP, the system downloads a .txt file.</div>
                 </div>
 
             </section>
@@ -960,10 +923,8 @@
 
                 <div class="card-header">
                     <div>
-                        <div class="card-title">Обратная связь</div>
-                        <div class="card-subtitle">
-                            Помогает улучшать промпт и качество генерации.
-                        </div>
+                        <div class="card-title" data-i18n="feedback_title">Feedback</div>
+                        <div class="card-subtitle" data-i18n="feedback_subtitle">Helps improve the prompt and output quality.</div>
                     </div>
                 </div>
 
@@ -973,9 +934,9 @@
 
                     <div class="feedback-grid">
                         <div class="field">
-                            <label for="rating">Оценка <span style="color:#ef4444;">*</span></label>
+                            <label for="rating" data-i18n="fb_rating_label">Rating <span style="color:#ef4444;">*</span></label>
                             <select id="rating" class="rating-input" required>
-                                <option value="">Выберите оценку</option>
+                                <option value="" data-i18n="fb_rating_placeholder">Select rating</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -985,56 +946,54 @@
                         </div>
 
                         <div class="field">
-                            <label for="email">Email (необязательно)</label>
-                            <input type="email" id="email" placeholder="Для связи по важным кейсам" />
+                            <label for="email" data-i18n="fb_email_label">Email (optional)</label>
+                            <input type="email" id="email" data-i18n-placeholder="fb_email_placeholder" placeholder="For follow-up on important cases" />
                         </div>
                     </div>
 
                     <div class="field">
-                        <label for="wouldUse">Ты бы стал(а) использовать это в реальной работе? Почему да / нет?</label>
+                        <label for="wouldUse" data-i18n="fb_woulduse_label">Would you use this in real work? Why yes/no?</label>
                         <select id="wouldUse" class="select-compact" style="max-width: 220px; margin-bottom: 8px;">
-                            <option value="">Не выбрано</option>
-                            <option value="Да">Да</option>
-                            <option value="Нет">Нет</option>
-                            <option value="Не уверен(а)">Не уверен(а)</option>
+                            <option value="" data-i18n="fb_not_selected">Not selected</option>
+                            <option value="Yes" data-i18n="fb_yes">Yes</option>
+                            <option value="No" data-i18n="fb_no">No</option>
+                            <option value="Not sure" data-i18n="fb_not_sure">Not sure</option>
                         </select>
-                        <textarea id="wouldUseWhy" placeholder="Почему да / нет?" style="min-height: 90px;"></textarea>
+                        <textarea id="wouldUseWhy" data-i18n-placeholder="fb_woulduse_why_placeholder" placeholder="Why yes/no?" style="min-height: 90px;"></textarea>
                     </div>
 
                     <div class="field">
-                        <label for="manualWork">Что пришлось бы сильно допиливать руками?</label>
-                        <textarea id="manualWork" placeholder="Опиши, что именно пришлось бы править/дополнять" style="min-height: 90px;"></textarea>
+                        <label for="manualWork" data-i18n="fb_manual_label">What would require a lot of manual editing?</label>
+                        <textarea id="manualWork" data-i18n-placeholder="fb_manual_placeholder" placeholder="Describe what you would need to change/add manually" style="min-height: 90px;"></textarea>
                     </div>
 
                     <div class="field">
-                        <label for="extra">Что лишнее?</label>
-                        <textarea id="extra" placeholder="Что убрать/упростить" style="min-height: 90px;"></textarea>
+                        <label for="extra" data-i18n="fb_extra_label">What feels unnecessary?</label>
+                        <textarea id="extra" data-i18n-placeholder="fb_extra_placeholder" placeholder="What to remove/simplify" style="min-height: 90px;"></textarea>
                     </div>
 
                     <div class="field">
-                        <label for="whereManual">Где ты сейчас делаешь это вручную?</label>
-                        <textarea id="whereManual" placeholder="Инструменты/процессы: Notion, Confluence, Jira, Docs и т.п." style="min-height: 90px;"></textarea>
+                        <label for="whereManual" data-i18n="fb_where_label">Where do you do this manually today?</label>
+                        <textarea id="whereManual" data-i18n-placeholder="fb_where_placeholder" placeholder="Tools/processes: Notion, Confluence, Jira, Docs, etc." style="min-height: 90px;"></textarea>
                     </div>
 
                     <div class="field">
-                        <label for="wontPayFor">За что точно не стал(а) бы платить?</label>
-                        <textarea id="wontPayFor" placeholder="Что не имеет ценности/не стоит денег" style="min-height: 90px;"></textarea>
+                        <label for="wontPayFor" data-i18n="fb_wontpay_label">What would you definitely not pay for?</label>
+                        <textarea id="wontPayFor" data-i18n-placeholder="fb_wontpay_placeholder" placeholder="What has no value / is not worth paying for" style="min-height: 90px;"></textarea>
                     </div>
 
                     <div class="field">
-                        <label for="wouldBeUpset">Если завтра сервис закроется — ты расстроишься?</label>
+                        <label for="wouldBeUpset" data-i18n="fb_upset_label">If the service shuts down tomorrow, would you be upset?</label>
                         <select id="wouldBeUpset" class="select-compact" style="max-width: 220px;">
-                            <option value="">Не выбрано</option>
-                            <option value="Да">Да</option>
-                            <option value="Нет">Нет</option>
-                            <option value="Не уверен(а)">Не уверен(а)</option>
+                            <option value="" data-i18n="fb_not_selected">Not selected</option>
+                            <option value="Yes" data-i18n="fb_yes">Yes</option>
+                            <option value="No" data-i18n="fb_no">No</option>
+                            <option value="Not sure" data-i18n="fb_not_sure">Not sure</option>
                         </select>
                     </div>
 
                     <div style="display:flex; justify-content:flex-end; gap:8px; align-items:center;">
-                        <button type="submit" class="btn-primary">
-                            Отправить фидбек
-                        </button>
+                        <button type="submit" class="btn-primary" data-i18n="fb_submit">Send feedback</button>
                     </div>
 
                 </form>
