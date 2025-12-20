@@ -94,7 +94,7 @@ const I18N = {
     alert_files_too_big:
       "File(s) exceed 5 MB and will not be added:",
     alert_duplicate_files: "File is already uploaded and won't be added again:",
-    status_generating: "Generating...",
+    status_generating_long: "Generating a draft of requirements, acceptance criteria, and test cases. This will take ~30–60 seconds",
     err_generic_title: "Generation failed",
     err_generic_details: "Server returned an unexpected response format.",
     err_timeout_title: "Request timed out",
@@ -208,7 +208,7 @@ const I18N = {
     alert_files_too_big: "Файл(ы) превышают 5 MB и не будут добавлены:",
     alert_duplicate_files:
       "Файл уже загружен и не будет добавлен повторно:",
-    status_generating: "Генерация...",
+    status_generating_long: "Генерируем черновик требований, AC и тест-кейсов. Это займёт ~30–60 секунд",
     err_generic_title: "Генерация не отработала",
     err_generic_details: "Сервер вернул ответ в неожиданном формате",
     err_timeout_title: "Превышено время ожидания",
@@ -451,6 +451,42 @@ if (kbFilesInputEl) {
 try {
   validateAndInitFromInput();
 } catch (_) {}
+function setResultLoading(message) {
+  const el = document.getElementById("result");
+  el.classList.add("is-loading");
+  el.replaceChildren(); // очищаем безопасно
+
+  const wrap = document.createElement("div");
+  wrap.className = "result-loading";
+
+  const spinner = document.createElement("span");
+  spinner.className = "result-spinner";
+  spinner.setAttribute("aria-hidden", "true");
+
+  const text = document.createElement("span");
+  text.textContent = message;
+
+  wrap.appendChild(spinner);
+  wrap.appendChild(text);
+  el.appendChild(wrap);
+}
+
+function setResultText(text) {
+  const el = document.getElementById("result");
+  el.classList.remove("is-loading");
+  el.textContent = text;
+}
+
+function setResultMarkdown(markdown) {
+  const el = document.getElementById("result");
+  el.classList.remove("is-loading");
+
+  if (typeof marked !== "undefined") {
+    el.innerHTML = marked.parse(markdown);
+  } else {
+    el.textContent = markdown;
+  }
+}
 
 
 document.getElementById("generateForm").addEventListener("submit", async (e) => {
@@ -494,7 +530,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
   };
 
   // пока ждём — просто текст
-  document.getElementById("result").innerText = t("status_generating");
+  setResultLoading(t("status_generating_long"));
 
   try {
     let res;
@@ -549,7 +585,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
         errorDetails = `Сервер вернул: ${responseText.substring(0, 100)}`;
       }
       
-      document.getElementById("result").innerText = `${errorMessage}\n\n${errorDetails}`;
+      setResultText(`${errorMessage}\n\n${errorDetails}`);
       return;
     }
 
@@ -586,7 +622,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
         }
       }
       
-      document.getElementById("result").innerText = `${errorMessage}\n\n${errorDetails}`;
+      setResultText(`${errorMessage}\n\n${errorDetails}`);
       console.error("Server error:", data);
       return;
     }
@@ -597,12 +633,8 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
     window.lastMarkdown = markdown;
 
     // рендерим markdown -> HTML (таблицы, <br> и т.д.)
-    if (typeof marked !== "undefined") {
-      document.getElementById("result").innerHTML = marked.parse(markdown);
-    } else {
-      // fallback, если вдруг marked не загрузился
-      document.getElementById("result").innerText = markdown;
-    }
+    setResultMarkdown(markdown);
+
 
     window.lastRequestId = data.requestId;
     window.isRegeneration = false;
@@ -622,7 +654,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
       errorDetails = err.message;
     }
     
-    document.getElementById("result").innerText = `${errorMessage}\n\n${errorDetails}`;
+    setResultText(`${errorMessage}\n\n${errorDetails}`);
   }
 });
 
