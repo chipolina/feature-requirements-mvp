@@ -2,13 +2,13 @@
 // ---------------- i18n (UI language) ----------------
 const I18N = {
   en: {
-    app_title: "AI Requirements Generator (MVP)",
+    app_title: "AI Requirements Generator",
     app_subtitle:
-      "Fast generation of requirements, acceptance criteria and test cases based on the feature description and knowledge base.",
+      "Create a structured first draft of requirements, acceptance criteria and test cases based on the feature description and knowledge base.",
     feature_title: "Feature description",
-    feature_subtitle: "This is the primary source of truth for the analysis.",
+    feature_subtitle: "Describe the feature as you would explain it to your dev team.",
     feature_placeholder:
-      "Example: the user can set a deadline for a task and get a reminder 24 hours before it.",
+      "Describe the feature as you would explain it to your dev team.\n\nInclude:\n– feature goal\n– target users\n– main user flow\n– constraints or edge cases (if any)\n\n5–10 sentences is usually enough.",
     kb_title: "Knowledge base",
     kb_subtitle: "Optional. Helps align the feature with the current product.",
     kb_collapse: "Collapse",
@@ -29,10 +29,10 @@ const I18N = {
     analysis_mode_label: "Analysis mode",
     analysis_mode_mvp: "Standard (MVP)",
     analysis_mode_enterprise: "Enterprise",
-    btn_generate: "Generate",
-    result_title: "Result",
+    btn_generate: "Create first draft",
+    result_title: "Draft result",
     result_subtitle:
-      "AI response in Markdown format (can be copied directly into a spec).",
+      "This is a first draft to help you start. Review and adapt it before use.",
     result_empty: "Empty so far — enter a feature description and run generation.",
     extra_label: "Additional information / answers to clarifying questions",
     extra_placeholder:
@@ -116,13 +116,13 @@ const I18N = {
     fb_try_again: "Please try again.",
   },
   ru: {
-    app_title: "AI Requirements Generator (MVP)",
+    app_title: "AI Requirements Generator",
     app_subtitle:
-      "Быстрая генерация требований, критериев приёмки и тест-кейсов на основе описания фичи и базы знаний.",
+      "Превратите идею фичи в структурированный черновик требований, acceptance criteria и тест-кейсов.",
     feature_title: "Описание фичи",
-    feature_subtitle: "Это основной источник правды для анализа.",
+    feature_subtitle: "Опишите фичу так, как вы бы объясняли её команде разработки.",
     feature_placeholder:
-      "Например: пользователь может устанавливать дедлайн для задачи и получать напоминание за 24 часа.",
+      "Опишите фичу так, как вы бы объясняли её команде разработки.\n\nУкажите:\n– цель фичи\n– пользователей\n– основной пользовательский сценарий\n– ограничения или edge cases (если есть)\n\nОбычно достаточно 5–10 предложений.",
     kb_title: "База знаний",
     kb_subtitle: "Опционально. Помогает согласовать фичу с текущим продуктом.",
     kb_collapse: "Свернуть",
@@ -143,12 +143,12 @@ const I18N = {
     analysis_mode_label: "Режим анализа",
     analysis_mode_mvp: "Стандартный (MVP)",
     analysis_mode_enterprise: "Enterprise",
-    btn_generate: "Сгенерировать",
-    result_title: "Результат",
+    btn_generate: "Создать черновик",
+    result_title: "Черновик",
     result_subtitle:
-      "Ответ ИИ в markdown-формате (его можно сразу копировать в ТЗ).",
+      "Это черновик, который помогает начать работу. Проверьте и адаптируйте перед использованием.",
     result_empty:
-      "Пока пусто — введите описание фичи и запустите генерацию.",
+      "Пока пусто — введите описание фичи и создайте черновик.",
     extra_label: "Дополнительная информация / ответы на уточняющие вопросы",
     extra_placeholder:
       "После первого прогона сюда можно вписать ответы на уточняющие вопросы или дополнительные детали по фиче.",
@@ -451,7 +451,7 @@ if (kbFilesInputEl) {
 try {
   validateAndInitFromInput();
 } catch (_) {}
-function setResultLoading(message) {
+function setDraftResultLoading(message) {
   const el = document.getElementById("result");
   el.classList.add("is-loading");
   el.replaceChildren(); // очищаем безопасно
@@ -471,13 +471,13 @@ function setResultLoading(message) {
   el.appendChild(wrap);
 }
 
-function setResultText(text) {
+function setDraftResultText(text) {
   const el = document.getElementById("result");
   el.classList.remove("is-loading");
   el.textContent = text;
 }
 
-function setResultMarkdown(markdown) {
+function setDraftResultMarkdown(markdown) {
   const el = document.getElementById("result");
   el.classList.remove("is-loading");
 
@@ -530,7 +530,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
   };
 
   // пока ждём — просто текст
-  setResultLoading(t("status_generating_long"));
+  setDraftResultLoading(t("status_generating_long"));
 
   try {
     let res;
@@ -585,7 +585,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
         errorDetails = `Сервер вернул: ${responseText.substring(0, 100)}`;
       }
       
-      setResultText(`${errorMessage}\n\n${errorDetails}`);
+      setDraftResultText(`${errorMessage}\n\n${errorDetails}`);
       return;
     }
 
@@ -622,7 +622,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
         }
       }
       
-      setResultText(`${errorMessage}\n\n${errorDetails}`);
+      setDraftResultText(`${errorMessage}\n\n${errorDetails}`);
       console.error("Server error:", data);
       return;
     }
@@ -633,7 +633,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
     window.lastMarkdown = markdown;
 
     // рендерим markdown -> HTML (таблицы, <br> и т.д.)
-    setResultMarkdown(markdown);
+    setDraftResultMarkdown(markdown);
 
 
     window.lastRequestId = data.requestId;
@@ -654,7 +654,7 @@ document.getElementById("generateForm").addEventListener("submit", async (e) => 
       errorDetails = err.message;
     }
     
-    setResultText(`${errorMessage}\n\n${errorDetails}`);
+    setDraftResultText(`${errorMessage}\n\n${errorDetails}`);
   }
 });
 
@@ -881,7 +881,7 @@ if (kbToggleBtn && kbContent) {
   let kbCollapsed = false;
 
   const updateKbToggleText = () => {
-    kbToggleBtn.textContent = kbCollapsed ? "Показать" : "Свернуть";
+    kbToggleBtn.textContent = kbCollapsed ? t("kb_expand") : t("kb_collapse");
   };
 
   kbToggleBtn.addEventListener("click", () => {
@@ -980,7 +980,7 @@ const renderLinks = () => {
     const removeBtn = document.createElement("span");
     removeBtn.className = "remove";
     removeBtn.textContent = "×";
-    removeBtn.setAttribute("aria-label", "Удалить ссылку");
+    removeBtn.setAttribute("aria-label", t("msg_delete"));
     removeBtn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
