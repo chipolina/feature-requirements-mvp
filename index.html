@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <title>Start your feature spec in minutes</title>
     <style>
         :root {
@@ -16,7 +18,9 @@
             --radius-md: 10px;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -26,15 +30,22 @@
             color: var(--text-main);
         }
 
-        .page { max-width: 980px; margin: 0 auto; }
+        .page {
+            max-width: 980px;
+            margin: 0 auto;
+        }
 
-        header { margin-bottom: 24px; }
+        header {
+            margin-bottom: 24px;
+        }
+
         header h1 {
             margin: 0 0 8px;
             font-size: 28px;
             font-weight: 700;
             letter-spacing: -0.03em;
         }
+
         header p {
             margin: 0;
             font-size: 14px;
@@ -46,8 +57,11 @@
             grid-template-columns: 1fr;
             gap: 20px;
         }
+
         @media (max-width: 900px) {
-            .layout { grid-template-columns: minmax(0, 1fr); }
+            .layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
         }
 
         .card {
@@ -59,7 +73,9 @@
                 0 0 0 1px rgba(148, 163, 184, 0.16);
         }
 
-        .card + .card { margin-top: 16px; }
+        .card+.card {
+            margin-top: 16px;
+        }
 
         .card-header {
             display: flex;
@@ -68,8 +84,15 @@
             margin-bottom: 14px;
         }
 
-        .card-title { font-size: 16px; font-weight: 600; }
-        .card-subtitle { font-size: 12px; color: var(--text-muted); }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
 
         label {
             font-size: 13px;
@@ -93,7 +116,9 @@
             background: #f9fafb;
         }
 
-        textarea { min-height: 130px; }
+        textarea {
+            min-height: 130px;
+        }
 
         /* маленькая высота для базы знаний */
         .textarea-small {
@@ -101,7 +126,9 @@
             max-height: 80px;
         }
 
-        input[type="file"] { font-size: 13px; }
+        input[type="file"] {
+            font-size: 13px;
+        }
 
         textarea:focus,
         input:focus,
@@ -112,13 +139,16 @@
             background: #ffffff;
         }
 
-        .field { margin-bottom: 14px; }
+        .field {
+            margin-bottom: 14px;
+        }
 
         .hint {
             font-size: 12px;
             color: var(--text-muted);
             margin-top: 2px;
         }
+
         .kb-block {
             margin-top: 10px;
         }
@@ -134,7 +164,8 @@
         /* контейнер с анимацией высоты/прозрачности */
         .kb-content {
             overflow: hidden;
-            max-height: 2000px; /* хватает на 2 поля */
+            max-height: 2000px;
+            /* хватает на 2 поля */
             opacity: 1;
             transform: translateY(0);
             transition:
@@ -216,8 +247,18 @@
             opacity: 1;
         }
 
-        .kb-files-list { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; width: 100%; }
-        .kb-file-remove:hover { filter: brightness(0.98); }
+        .kb-files-list {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .kb-file-remove:hover {
+            filter: brightness(0.98);
+        }
+
         .kb-file-item {
             display: flex;
             align-items: center;
@@ -273,7 +314,9 @@
             font-size: 12px;
         }
 
-        .checkbox-pill input { margin: 0; }
+        .checkbox-pill input {
+            margin: 0;
+        }
 
         .toolbar {
             display: flex;
@@ -302,7 +345,9 @@
             background: linear-gradient(135deg, #4f46e5, #6366f1);
             color: #ffffff;
             box-shadow: 0 10px 20px rgba(79, 70, 229, 0.30);
+            margin-bottom: 8px;
         }
+
         .btn-primary:hover {
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
             transform: translateY(-1px);
@@ -313,7 +358,10 @@
             background: #eef2ff;
             color: #3730a3;
         }
-        .btn-secondary:hover { background: #e0e7ff; }
+
+        .btn-secondary:hover {
+            background: #e0e7ff;
+        }
 
         .btn-ghost {
             background: transparent;
@@ -341,31 +389,34 @@
             max-height: 520px;
             overflow: auto;
         }
-                /* ===== Loading spinner in result ===== */
+
+        /* ===== Loading spinner in result ===== */
         .result-loading {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
         }
 
         .result-spinner {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        border: 2px solid rgba(17, 24, 39, 0.18);
-        border-top-color: var(--accent);
-        animation: resultSpin 0.8s linear infinite;
-        flex: 0 0 auto;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(17, 24, 39, 0.18);
+            border-top-color: var(--accent);
+            animation: resultSpin 0.8s linear infinite;
+            flex: 0 0 auto;
         }
 
         @keyframes resultSpin {
-        to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* чтобы лоадер выглядел “как строка”, а не как pre-wrap блок текста */
         #result.is-loading {
-        white-space: normal;
+            white-space: normal;
         }
 
 
@@ -376,7 +427,7 @@
             gap: 10px;
         }
 
-        .rating-input { 
+        .rating-input {
             max-width: 200px;
             min-width: 180px;
         }
@@ -427,48 +478,51 @@
         }
 
         .switch {
-        position: relative;
-        display: inline-block;
-        width: 46px;
-        height: 24px;
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
         }
 
-        .switch input { 
-        opacity: 0;
-        width: 0;
-        height: 0;
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
 
         .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0; left: 0;
-        right: 0; bottom: 0;
-        background-color: #d1d5db;
-        border-radius: 24px;
-        transition: .25s;
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            border-radius: 24px;
+            transition: .25s;
         }
 
         .slider:before {
-        position: absolute;
-        content: "";
-        height: 18px; 
-        width: 18px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        border-radius: 50%;
-        transition: .25s;
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .25s;
         }
 
-        
 
-        input:checked + .slider {
-        background-color: #6366f1; /* фиолетовый */
+
+        input:checked+.slider {
+            background-color: #6366f1;
+            /* фиолетовый */
         }
 
-        input:checked + .slider:before {
-        transform: translateX(22px);
+        input:checked+.slider:before {
+            transform: translateX(22px);
         }
 
         /* Заголовки разделов внутри результата - убираем пустые строки */
@@ -480,7 +534,8 @@
         #result h6 {
             font-weight: 600;
             margin-top: 24px;
-            margin-bottom: 2px; /* Минимальный отступ, чтобы убрать пустые строки */
+            margin-bottom: 2px;
+            /* Минимальный отступ, чтобы убрать пустые строки */
         }
 
         #result h3 {
@@ -488,12 +543,12 @@
         }
 
         /* Убираем лишние отступы у первого элемента после заголовка */
-        #result h1 + *,
-        #result h2 + *,
-        #result h3 + *,
-        #result h4 + *,
-        #result h5 + *,
-        #result h6 + * {
+        #result h1+*,
+        #result h2+*,
+        #result h3+*,
+        #result h4+*,
+        #result h5+*,
+        #result h6+* {
             margin-top: 0;
         }
 
@@ -513,13 +568,16 @@
         #result h3 {
             font-size: 16px;
             font-weight: 600;
-            margin-top: 28px; /* ровно “две строки” */
-            margin-bottom: 8px; /* одна строка снизу */
+            margin-top: 28px;
+            /* ровно “две строки” */
+            margin-bottom: 8px;
+            /* одна строка снизу */
         }
 
         #result th,
         #result td {
-            border: 1px solid rgba(148, 163, 184, 0.7); /* тонкая серая рамка */
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            /* тонкая серая рамка */
             padding: 6px 8px;
             font-size: 13px;
         }
@@ -535,16 +593,20 @@
         #result td:first-child {
             font-weight: 600;
         }
+
         #result p:empty,
         #result p:blank {
-            margin: 4px 0 !important; /* аккуратный маленький отступ */
-            height: 8px; /* создаёт одну “визуальную” строку */
+            margin: 4px 0 !important;
+            /* аккуратный маленький отступ */
+            height: 8px;
+            /* создаёт одну “визуальную” строку */
         }
 
         #result p:has(br:only-child) {
             margin: 4px 0 !important;
             height: 8px;
         }
+
         /* KB files list: показывать все файлы, длинные имена обрезаются в строке */
         #kbFilesList {
             display: flex;
@@ -581,10 +643,12 @@
                 transform: scale(1);
                 box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.55);
             }
+
             50% {
                 transform: scale(1.03);
                 box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.0);
             }
+
             100% {
                 transform: scale(1);
                 box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.0);
@@ -592,18 +656,23 @@
         }
 
 
-    
+
         /* ===== Tooltips (ⓘ) ===== */
         .label-row {
             display: flex;
             align-items: center;
-            justify-content: flex-start; /* важно: не space-between */
-            gap: 10px; 
+            justify-content: flex-start;
+            /* важно: не space-between */
+            gap: 10px;
         }
-        .label-row > label { margin: 0; }
 
-        .label-row .tooltip{
-            margin-left: 0;   /* если было auto — убираем */
+        .label-row>label {
+            margin: 0;
+        }
+
+        .label-row .tooltip {
+            margin-left: 0;
+            /* если было auto — убираем */
             flex: 0 0 auto;
         }
 
@@ -613,7 +682,10 @@
             display: inline-flex;
             align-items: center;
         }
-        .tooltip-inline { margin-left: 8px; }
+
+        .tooltip-inline {
+            margin-left: 8px;
+        }
 
         .info-icon {
             width: 18px;
@@ -632,8 +704,15 @@
             padding: 0;
             user-select: none;
         }
-        .info-icon:hover { background: rgba(79, 70, 229, 0.14); }
-        .info-icon:focus { outline: none; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18); }
+
+        .info-icon:hover {
+            background: rgba(79, 70, 229, 0.14);
+        }
+
+        .info-icon:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
+        }
 
         .tooltip-content {
             display: none;
@@ -665,18 +744,36 @@
             margin: 0 0 6px 0;
             font-size: 12.5px;
         }
-        .tooltip-content .tt-muted { color: var(--text-muted); margin: 0 0 8px 0; }
-        .tooltip-content ul { margin: 6px 0 0 18px; padding: 0; }
-        .tooltip-content li { margin: 2px 0; }
+
+        .tooltip-content .tt-muted {
+            color: var(--text-muted);
+            margin: 0 0 8px 0;
+        }
+
+        .tooltip-content ul {
+            margin: 6px 0 0 18px;
+            padding: 0;
+        }
+
+        .tooltip-content li {
+            margin: 2px 0;
+        }
 
         /* Hover pointer for interactive items */
-        .checkbox-pill { cursor: pointer; }
-        .kb-header, .kb-toggle-btn { cursor: pointer; }
+        .checkbox-pill {
+            cursor: pointer;
+        }
+
+        .kb-header,
+        .kb-toggle-btn {
+            cursor: pointer;
+        }
 
         /* Pills layout with right-side tooltip icon */
         .checkbox-pill {
             justify-content: space-between;
         }
+
         .checkbox-pill .pill-main {
             display: inline-flex;
             align-items: center;
@@ -684,6 +781,7 @@
             min-width: 0;
             flex: 1 1 auto;
         }
+
         .checkbox-pill .pill-main span {
             min-width: 0;
             overflow: hidden;
@@ -692,7 +790,8 @@
         }
 
         #feature {
-            min-height: 160px; /* +10px */
+            min-height: 160px;
+            /* +10px */
         }
 
 
@@ -703,333 +802,393 @@
             max-width: 170px;
             padding: 8px 10px;
             border-radius: 10px;
-            border: 1px solid rgba(0,0,0,0.15);
+            border: 1px solid rgba(0, 0, 0, 0.15);
             background: #fff;
             font-size: 14px;
             line-height: 20px;
             white-space: nowrap;
         }
 
+
+        /* --- Draft result structure --- */
+        .result-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .result-microtext {
+            margin: 0;
+            color: #4b5563;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .result-sections {
+            display: grid;
+            gap: 12px;
+        }
+
+        .result-card {
+            background: #ffffff;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .result-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+        .result-card--primary h3 {
+            font-size: 15px;
+        }
+
+        .result-card--secondary {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .result-next {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px dashed rgba(15, 23, 42, 0.18);
+            border-radius: 14px;
+            padding: 12px 14px;
+        }
+
+        .result-next-title {
+            margin: 0 0 6px 0;
+            font-size: 13px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .result-next ul {
+            margin: 0;
+            padding-left: 18px;
+            color: #334155;
+            font-size: 13px;
+        }
     </style>
 </head>
+
 <body>
-<div class="page">
-    <header>
-        <h1 data-i18n="app_title">Start your feature spec in minutes (MVP)</h1>
-        <p data-i18n="app_subtitle">Fast generation of requirements, acceptance criteria and test cases based on the feature description and knowledge base.</p>
-    </header>
-
-    <div class="layout">
-        <!-- Левая колонка: форма генерации -->
-        <div>
-            <form id="generateForm" class="card">
-                <div class="card-header">
-                    <div>
-                        <div class="card-title" data-i18n="feature_title">Feature description</div>
-                        <div class="card-subtitle" data-i18n="feature_subtitle">This is the primary source of truth for the analysis.</div>
-                    </div>
-                    <select id="uiLanguage" class="lang-select" aria-label="Interface language">
-                        <option value="en">English 🇬🇧</option>
-                        <option value="ru">Русский 🇷🇺</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <textarea id="feature" required data-i18n-placeholder="feature_placeholder" placeholder="Example: the user can set a deadline for a task and get a reminder 24 hours before it."></textarea>
-                </div>
-
-                <!-- БЛОК БАЗЫ ЗНАНИЙ (collapsible) -->
-                <div class="kb-block">
-                    <div class="card-header kb-header">
+    <div class="page">
+        <header>
+            <h1 data-i18n="app_title">Start your feature spec in minutes (MVP)</h1>
+            <p data-i18n="app_subtitle">Fast generation of requirements, acceptance criteria and test cases based on the
+                feature description and knowledge base.</p>
+            <p class="muted" data-i18n="app_description">Use as a starting point — not a final spec.</p>
+        </header>
+        <div class="layout">
+            <!-- Левая колонка: форма генерации -->
+            <div>
+                <form class="card" id="generateForm">
+                    <div class="card-header">
                         <div>
-                            <div class="card-title" data-i18n="kb_title">Knowledge base
-                            <span class="tooltip">
-                                <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
-                                <div class="tooltip-content" data-i18n-html="kb_tooltip_html"></div>
-                            </span></div>
-                            <div class="card-subtitle" data-i18n="kb_subtitle">Optional. Helps align the feature with the current product.</div>
+                            <div class="card-title" data-i18n="feature_title">Feature description</div>
+                            <div class="card-subtitle" data-i18n="feature_subtitle">This is the primary source of truth
+                                for the analysis.</div>
                         </div>
-                        <button type="button" id="kbToggle" class="btn-ghost kb-toggle-btn">
-                            <span data-i18n="kb_collapse">Collapse</span>
-                        </button>
+                        <select aria-label="Interface language" class="lang-select" id="uiLanguage">
+                            <option value="en">English 🇬🇧</option>
+                            <option value="ru">Русский 🇷🇺</option>
+                        </select>
                     </div>
-
-                    <div id="kbContent" class="kb-content">
-                        <div class="field">
-                            <div class="label-row">
-                            <label for="kbLinks" data-i18n="links_label">Links</label>
+                    <div class="field">
+                        <textarea data-i18n-placeholder="feature_placeholder" id="feature"
+                            placeholder="Example: the user can set a deadline for a task and get a reminder 24 hours before it."
+                            required=""></textarea>
+                        <div class="hint" data-i18n="feature_hint">The better the input, the more useful the draft.
                         </div>
-                            <div id="kbLinksContainer" class="kb-links-container">
-                                <input 
-                                    type="text" 
-                                    id="kbLinksInput" 
-                                    data-i18n-placeholder="links_placeholder"
-                                    placeholder="Enter a link and press Enter or comma..."
-                                    class="kb-links-input"
-                                />
+                    </div>
+                    <!-- БЛОК БАЗЫ ЗНАНИЙ (collapsible) -->
+                    <div class="kb-block">
+                        <div class="card-header kb-header">
+                            <div>
+                                <div class="card-title" data-i18n="kb_title">Knowledge base
+                                    <span class="tooltip">
+                                        <button aria-label="Info" class="info-icon" type="button">ⓘ</button>
+                                        <div class="tooltip-content" data-i18n-html="kb_tooltip_html"></div>
+                                    </span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="kb_subtitle">Optional. Helps align the feature
+                                    with the current product.</div>
                             </div>
-                            <div id="kbLinksList" class="kb-links-list"></div>
-                            <div class="hint" data-i18n="links_hint">You can add links to docs, Confluence, Notion, etc. Use Ctrl+Click to open a link.</div>
+                            <button class="btn-ghost kb-toggle-btn" id="kbToggle" type="button">
+                                <span data-i18n="kb_collapse">Collapse</span>
+                            </button>
                         </div>
-
-                        <div class="field">
-                            <div class="label-row">
-                            <label for="kbFiles" data-i18n="kb_files_label">Knowledge base files (PDF, DOCX, TXT, XLSX, MD)</label>
-                        </div>
-                            <input
-                                id="kbFiles"
-                                type="file"
-                                multiple
-                                accept=".pdf,.docx,.txt,.xlsx,.md"
-                           />
-                            <div id="kbFilesList" class="kb-files-list"></div>
-
-                            <div class="hint" data-i18n="kb_files_hint">Up to 3 files, max 5 MB each.</div>
+                        <div class="kb-content" id="kbContent">
+                            <div class="field">
+                                <div class="label-row">
+                                    <label data-i18n="links_label" for="kbLinks">Links</label>
+                                </div>
+                                <div class="kb-links-container" id="kbLinksContainer">
+                                    <input class="kb-links-input" data-i18n-placeholder="links_placeholder"
+                                        id="kbLinksInput" placeholder="Enter a link and press Enter or comma..."
+                                        type="text" />
+                                </div>
+                                <div class="kb-links-list" id="kbLinksList"></div>
+                                <div class="hint" data-i18n="links_hint">You can add links to docs, Confluence, Notion,
+                                    etc. Use Ctrl+Click to open a link.</div>
+                            </div>
+                            <div class="field">
+                                <div class="label-row">
+                                    <label data-i18n="kb_files_label" for="kbFiles">Knowledge base files (PDF, DOCX,
+                                        TXT, XLSX, MD)</label>
+                                </div>
+                                <input accept=".pdf,.docx,.txt,.xlsx,.md" id="kbFiles" multiple="" type="file" />
+                                <div class="kb-files-list" id="kbFilesList"></div>
+                                <div class="hint" data-i18n="kb_files_hint">Up to 3 files, max 5 MB each.</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-
-                <div class="field">
-                    <div class="label-row">
-                        <label data-i18n="include_label">What to include in generation</label>
+                    <div class="field">
+                        <div class="label-row">
+                            <label data-i18n="include_label">What to include in generation</label>
                             <span class="tooltip">
-                                <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
+                                <button aria-label="Info" class="info-icon" type="button">ⓘ</button>
                                 <div class="tooltip-content" data-i18n-html="include_tooltip_html"></div>
                             </span>
-                    </div>
-                    <div class="checkbox-group">
-                        <label class="checkbox-pill">
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-pill">
                                 <span class="pill-main">
-                                <input type="checkbox" id="incAC" checked />
-                                <span data-i18n="inc_ac">Acceptance Criteria</span>
-                            </span>
-                            <span class="tooltip tooltip-inline">
-                                <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
-                                <div class="tooltip-content" data-i18n-html="tt_ac_html"></div>
-                            </span>
-                        </label>
-                        <label class="checkbox-pill">
-                            <span class="pill-main">
-                                <input type="checkbox" id="incTC" checked />
-                                <span data-i18n="inc_tc">Test cases</span>
-                            </span>
-                            <span class="tooltip tooltip-inline">
-                                <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
-                                <div class="tooltip-content" data-i18n-html="tt_tc_html"></div>
-                            </span>
-                        </label>
-                        <label class="checkbox-pill">
-                            <span class="pill-main">
-                            <input type="checkbox" id="incNeg" checked />
-                            <span data-i18n="inc_neg">Negative scenarios</span>
-                        </span>
-                        <span class="tooltip tooltip-inline">
-                            <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
-                            <div class="tooltip-content" data-i18n-html="tt_neg_html"></div>
-                        </span>
-                    </label>
-                        <label class="checkbox-pill">
-                            <span class="pill-main">
-                            <input type="checkbox" id="incOOS" checked />
-                            <span data-i18n="inc_oos">Out of Scope</span>
-                        </span>
-                        <span class="tooltip tooltip-inline">
-                            <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
-                            <div class="tooltip-content" data-i18n-html="tt_oos_html"></div>
-                        </span>
-                    </label>
-                        <!-- Опция "Использовать базу знаний" удалена: KB применяется автоматически, если добавлены ссылки/файлы -->
+                                    <input checked="" id="incAC" type="checkbox" />
+                                    <span data-i18n="inc_ac">Acceptance Criteria</span>
+                                </span>
+                                <span class="tooltip tooltip-inline">
+                                    <button aria-label="Info" class="info-icon" type="button">ⓘ</button>
+                                    <div class="tooltip-content" data-i18n-html="tt_ac_html"></div>
+                                </span>
+                            </label>
+                            <label class="checkbox-pill">
+                                <span class="pill-main">
+                                    <input checked="" id="incTC" type="checkbox" />
+                                    <span data-i18n="inc_tc">Test cases</span>
+                                </span>
+                                <span class="tooltip tooltip-inline">
+                                    <button aria-label="Info" class="info-icon" type="button">ⓘ</button>
+                                    <div class="tooltip-content" data-i18n-html="tt_tc_html"></div>
+                                </span>
+                            </label>
+                            <label class="checkbox-pill">
+                                <span class="pill-main">
+                                    <input checked="" id="incNeg" type="checkbox" />
+                                    <span data-i18n="inc_neg">Negative scenarios</span>
+                                </span>
+                                <span class="tooltip tooltip-inline">
+                                    <button aria-label="Info" class="info-icon" type="button">ⓘ</button>
+                                    <div class="tooltip-content" data-i18n-html="tt_neg_html"></div>
+                                </span>
+                            </label>
+                            <label class="checkbox-pill">
+                                <span class="pill-main">
+                                    <input checked="" id="incOOS" type="checkbox" />
+                                    <span data-i18n="inc_oos">Out of Scope</span>
+                                </span>
+                                <span class="tooltip tooltip-inline">
+                                    <button aria-label="Info" class="info-icon" type="button">ⓘ</button>
+                                    <div class="tooltip-content" data-i18n-html="tt_oos_html"></div>
+                                </span>
+                            </label>
+                            <!-- Опция "Использовать базу знаний" удалена: KB применяется автоматически, если добавлены ссылки/файлы -->
+                        </div>
                     </div>
-                </div>
-
-                <div class="toolbar">
-                    <div style="display: flex; flex-direction: column;">
-                        <div class="label-row">
-    <label for="language" data-i18n="output_lang_label">Output language</label>
-    <span class="tooltip">
-        <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
-        <div class="tooltip-content" data-i18n-html="output_lang_tooltip_html"></div>
-    </span>
-</div>
-                        <select id="language">
-                            <option value="EN">English</option>
-                            <option value="RU">Русский</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+                    <div class="toolbar">
                         <div style="display: flex; flex-direction: column;">
                             <div class="label-row">
-                                <label for="analysisModeToggle" data-i18n="analysis_mode_label">Analysis mode</label>
-                                
-                            <span class="tooltip">
-                                <button type="button" class="info-icon" aria-label="Info">ⓘ</button>
-                                <div class="tooltip-content" data-i18n-html="analysis_mode_tooltip_html"></div>
-                            </span>
+                                <label data-i18n="output_lang_label" for="language">Output language</label>
+                                <span class="tooltip">
+                                    <button aria-label="Info" class="info-icon" type="button">ⓘ</button>
+                                    <div class="tooltip-content" data-i18n-html="output_lang_tooltip_html"></div>
+                                </span>
                             </div>
-                            <div class="toggle-wrap">
-                                <span class="toggle-label" data-i18n="analysis_mode_mvp">Standard (MVP)</span>
-                                <label class="switch">
-                                    <input id="analysisModeToggle" type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="toggle-label" data-i18n="analysis_mode_enterprise">Enterprise</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                        <label style="visibility: hidden;">&nbsp;</label>
-                        <button type="submit" class="btn-primary" data-i18n="btn_generate">Generate</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- Правая колонка: результат + уточнения + фидбек -->
-        <div>
-            <!-- ===== РЕЗУЛЬТАТ ===== -->
-            <section class="card">
-
-                <div class="card-header">
-                    <div>
-                        <div class="card-title" data-i18n="result_title">Result</div>
-                        <div class="card-subtitle" data-i18n="result_subtitle">AI response in Markdown format (can be copied directly into a spec).</div>
-                    </div>
-                </div>
-
-                <!-- Ответ -->
-                <div id="result" data-i18n="result_empty">Empty so far — enter a feature description and run generation.</div>
-
-
-                <!-- ===== ДОП. ИНФОРМАЦИЯ ===== -->
-                <div class="field" style="margin-top: 20px;">
-                    <label for="extraInfo" data-i18n="extra_label">Additional information / answers to clarifying questions</label>
-
-                    <textarea id="extraInfo" data-i18n-placeholder="extra_placeholder" placeholder="After the first run, you can add answers to clarifying questions or extra details here."></textarea>
-
-                    <div class="hint" data-i18n="extra_hint">This information will be used in the next generation.</div>
-
-                    <div style="margin-top: 8px; display:flex; justify-content:flex-end;">
-                        <button type="button" id="clarifyBtn" class="btn-primary" style="display:none;">
-                            <span data-i18n="btn_refine">Refine</span>
-                        </button>
-                    </div>
-                </div>
-
-
-                <!-- ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА ===== -->
-                <div class="field" style="margin-top: 20px;">
-                    <label data-i18n="save_label">Save result</label>
-
-                    <div class="inline-controls">
-                        <select id="fileFormat" class="select-compact">
-                            <option value="md">Markdown (.md)</option>
-                            <option value="txt" data-i18n="save_opt_txt">Text file (.txt)</option>
-                            <option value="word">Word (MVP: .txt)</option>
-                            <option value="pdf">PDF (MVP: .txt)</option>
-                            <option value="xlsx">Excel (MVP: .txt)</option>
-                        </select>
-
-                        <button type="button" id="downloadBtn" class="btn-primary" data-i18n="save_btn">Save file</button>
-                    </div>
-
-                    <div class="hint" data-i18n="save_hint">File name = feature name. For Word/PDF/Excel in this MVP, the system downloads a .txt file.</div>
-                </div>
-
-            </section>
-
-
-
-            <!-- ===== ОБРАТНАЯ СВЯЗЬ ===== -->
-            <section class="card">
-
-                <div class="card-header">
-                    <div>
-                        <div class="card-title" data-i18n="feedback_title">Feedback</div>
-                        <div class="card-subtitle" data-i18n="feedback_subtitle">Helps improve the prompt and output quality.</div>
-                    </div>
-                </div>
-
-                <form id="feedbackForm">
-
-                    <div id="feedbackMessage" style="display:none; padding:10px; margin-bottom:10px; border-radius:4px; background:#f0f9ff; border:1px solid #3b82f6; color:#1e40af;"></div>
-
-                    <div class="feedback-grid">
-                        <div class="field">
-                            <label for="rating" data-i18n="fb_rating_label">Rating <span style="color:#ef4444;">*</span></label>
-                            <select id="rating" class="rating-input" required>
-                                <option value="" data-i18n="fb_rating_placeholder">Select rating</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
+                            <select id="language">
+                                <option value="EN">English</option>
+                                <option value="RU">Русский</option>
                             </select>
                         </div>
+                        <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+                            <div style="display: flex; flex-direction: column;">
+                                <div class="label-row">
+                                    <label data-i18n="analysis_mode_label" for="analysisModeToggle">Analysis
+                                        mode</label>
+                                    <span class="tooltip">
+                                        <button aria-label="Info" class="info-icon" type="button">ⓘ</button>
+                                        <div class="tooltip-content" data-i18n-html="analysis_mode_tooltip_html"></div>
+                                    </span>
+                                </div>
+                                <div class="toggle-wrap">
+                                    <span class="toggle-label" data-i18n="analysis_mode_mvp">Standard (MVP)</span>
+                                    <label class="switch">
+                                        <input id="analysisModeToggle" type="checkbox" />
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="toggle-label" data-i18n="analysis_mode_enterprise">Enterprise</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                            <label style="visibility: hidden;"> </label>
 
-                        <div class="field">
-                            <label for="email" data-i18n="fb_email_label">Email (optional)</label>
-                            <input type="email" id="email" data-i18n-placeholder="fb_email_placeholder" placeholder="For follow-up on important cases" />
+                            <button class="btn-primary" data-i18n="btn_generate" type="submit">
+                                Generate
+                            </button>
+
+                            <button class="btn-secondary" data-i18n="btn_try_example" id="tryExampleBtn" type="button">
+                                Try with an example
+                            </button>
+
+                            <div class="hint" data-i18n="try_example_helper">
+                                See how a well-written input affects the result.
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <!-- Правая колонка: результат + уточнения + фидбек -->
+            <div>
+                <!-- ===== РЕЗУЛЬТАТ ===== -->
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title" data-i18n="result_title">Result</div>
+                            <div class="card-subtitle" data-i18n="result_subtitle">AI response in Markdown format (can
+                                be copied directly into a spec).</div>
                         </div>
                     </div>
-
-                    <div class="field">
-                        <label for="wouldUse" data-i18n="fb_woulduse_label">Would you use this in real work? Why yes/no?</label>
-                        <select id="wouldUse" class="select-compact" style="max-width: 220px; margin-bottom: 8px;">
-                            <option value="" data-i18n="fb_not_selected">Not selected</option>
-                            <option value="Yes" data-i18n="fb_yes">Yes</option>
-                            <option value="No" data-i18n="fb_no">No</option>
-                            <option value="Not sure" data-i18n="fb_not_sure">Not sure</option>
-                        </select>
-                        <textarea id="wouldUseWhy" data-i18n-placeholder="fb_woulduse_why_placeholder" placeholder="Why yes/no?" style="min-height: 90px;"></textarea>
+                    <!-- Ответ -->
+                    <div data-i18n="result_empty" id="result">Empty so far — enter a feature description and run
+                        generation.</div>
+                    <!-- ===== ДОП. ИНФОРМАЦИЯ ===== -->
+                    <div class="field" style="margin-top: 20px;">
+                        <label data-i18n="extra_label" for="extraInfo">Additional information / answers to clarifying
+                            questions</label>
+                        <textarea data-i18n-placeholder="extra_placeholder" id="extraInfo"
+                            placeholder="After the first run, you can add answers to clarifying questions or extra details here."></textarea>
+                        <div class="hint" data-i18n="extra_hint">This information will be used in the next generation.
+                        </div>
+                        <div style="margin-top: 8px; display:flex; justify-content:flex-end;">
+                            <button class="btn-primary" id="clarifyBtn" style="display:none;" type="button">
+                                <span data-i18n="btn_refine">Refine</span>
+                            </button>
+                        </div>
                     </div>
-
-                    <div class="field">
-                        <label for="manualWork" data-i18n="fb_manual_label">What would require a lot of manual editing?</label>
-                        <textarea id="manualWork" data-i18n-placeholder="fb_manual_placeholder" placeholder="Describe what you would need to change/add manually" style="min-height: 90px;"></textarea>
+                    <!-- ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА ===== -->
+                    <div class="field" style="margin-top: 20px;">
+                        <label data-i18n="save_label">Save result</label>
+                        <div class="inline-controls">
+                            <select class="select-compact" id="fileFormat">
+                                <option value="md">Markdown (.md)</option>
+                                <option data-i18n="save_opt_txt" value="txt">Text file (.txt)</option>
+                                <option value="word">Word (MVP: .txt)</option>
+                                <option value="pdf">PDF (MVP: .txt)</option>
+                                <option value="xlsx">Excel (MVP: .txt)</option>
+                            </select>
+                            <button class="btn-primary" data-i18n="save_btn" id="downloadBtn" type="button">Save
+                                file</button>
+                        </div>
+                        <div class="hint" data-i18n="save_hint">File name = feature name. For Word/PDF/Excel in this
+                            MVP, the system downloads a .txt file.</div>
                     </div>
-
-                    <div class="field">
-                        <label for="extra" data-i18n="fb_extra_label">What feels unnecessary?</label>
-                        <textarea id="extra" data-i18n-placeholder="fb_extra_placeholder" placeholder="What to remove/simplify" style="min-height: 90px;"></textarea>
+                </section>
+                <!-- ===== ОБРАТНАЯ СВЯЗЬ ===== -->
+                <section class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title" data-i18n="feedback_title">Feedback</div>
+                            <div class="card-subtitle" data-i18n="feedback_subtitle">Helps improve the prompt and output
+                                quality.</div>
+                        </div>
                     </div>
-
-                    <div class="field">
-                        <label for="whereManual" data-i18n="fb_where_label">Where do you do this manually today?</label>
-                        <textarea id="whereManual" data-i18n-placeholder="fb_where_placeholder" placeholder="Tools/processes: Notion, Confluence, Jira, Docs, etc." style="min-height: 90px;"></textarea>
-                    </div>
-
-                    <div class="field">
-                        <label for="wontPayFor" data-i18n="fb_wontpay_label">What would you definitely not pay for?</label>
-                        <textarea id="wontPayFor" data-i18n-placeholder="fb_wontpay_placeholder" placeholder="What has no value / is not worth paying for" style="min-height: 90px;"></textarea>
-                    </div>
-
-                    <div class="field">
-                        <label for="wouldBeUpset" data-i18n="fb_upset_label">If the service shuts down tomorrow, would you be upset?</label>
-                        <select id="wouldBeUpset" class="select-compact" style="max-width: 220px;">
-                            <option value="" data-i18n="fb_not_selected">Not selected</option>
-                            <option value="Yes" data-i18n="fb_yes">Yes</option>
-                            <option value="No" data-i18n="fb_no">No</option>
-                            <option value="Not sure" data-i18n="fb_not_sure">Not sure</option>
-                        </select>
-                    </div>
-
-                    <div style="display:flex; justify-content:flex-end; gap:8px; align-items:center;">
-                        <button type="submit" class="btn-primary" data-i18n="fb_submit">Send feedback</button>
-                    </div>
-
-                </form>
-
-            </section>
+                    <form id="feedbackForm">
+                        <div id="feedbackMessage"
+                            style="display:none; padding:10px; margin-bottom:10px; border-radius:4px; background:#f0f9ff; border:1px solid #3b82f6; color:#1e40af;">
+                        </div>
+                        <div class="feedback-grid">
+                            <div class="field">
+                                <label data-i18n="fb_rating_label" for="rating">Rating <span
+                                        style="color:#ef4444;">*</span></label>
+                                <select class="rating-input" id="rating" required="">
+                                    <option data-i18n="fb_rating_placeholder" value="">Select rating</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label data-i18n="fb_email_label" for="email">Email (optional)</label>
+                                <input data-i18n-placeholder="fb_email_placeholder" id="email"
+                                    placeholder="For follow-up on important cases" type="email" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label data-i18n="fb_woulduse_label" for="wouldUse">Would you use this in real work? Why
+                                yes/no?</label>
+                            <select class="select-compact" id="wouldUse" style="max-width: 220px; margin-bottom: 8px;">
+                                <option data-i18n="fb_not_selected" value="">Not selected</option>
+                                <option data-i18n="fb_yes" value="Yes">Yes</option>
+                                <option data-i18n="fb_no" value="No">No</option>
+                                <option data-i18n="fb_not_sure" value="Not sure">Not sure</option>
+                            </select>
+                            <textarea data-i18n-placeholder="fb_woulduse_why_placeholder" id="wouldUseWhy"
+                                placeholder="Why yes/no?" style="min-height: 90px;"></textarea>
+                        </div>
+                        <div class="field">
+                            <label data-i18n="fb_manual_label" for="manualWork">What would require a lot of manual
+                                editing?</label>
+                            <textarea data-i18n-placeholder="fb_manual_placeholder" id="manualWork"
+                                placeholder="Describe what you would need to change/add manually"
+                                style="min-height: 90px;"></textarea>
+                        </div>
+                        <div class="field">
+                            <label data-i18n="fb_extra_label" for="extra">What feels unnecessary?</label>
+                            <textarea data-i18n-placeholder="fb_extra_placeholder" id="extra"
+                                placeholder="What to remove/simplify" style="min-height: 90px;"></textarea>
+                        </div>
+                        <div class="field">
+                            <label data-i18n="fb_where_label" for="whereManual">Where do you do this manually
+                                today?</label>
+                            <textarea data-i18n-placeholder="fb_where_placeholder" id="whereManual"
+                                placeholder="Tools/processes: Notion, Confluence, Jira, Docs, etc."
+                                style="min-height: 90px;"></textarea>
+                        </div>
+                        <div class="field">
+                            <label data-i18n="fb_wontpay_label" for="wontPayFor">What would you definitely not pay
+                                for?</label>
+                            <textarea data-i18n-placeholder="fb_wontpay_placeholder" id="wontPayFor"
+                                placeholder="What has no value / is not worth paying for"
+                                style="min-height: 90px;"></textarea>
+                        </div>
+                        <div class="field">
+                            <label data-i18n="fb_upset_label" for="wouldBeUpset">If the service shuts down tomorrow,
+                                would you be upset?</label>
+                            <select class="select-compact" id="wouldBeUpset" style="max-width: 220px;">
+                                <option data-i18n="fb_not_selected" value="">Not selected</option>
+                                <option data-i18n="fb_yes" value="Yes">Yes</option>
+                                <option data-i18n="fb_no" value="No">No</option>
+                                <option data-i18n="fb_not_sure" value="Not sure">Not sure</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; gap:8px; align-items:center;">
+                            <button class="btn-primary" data-i18n="fb_submit" type="submit">Send feedback</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
         </div>
-
+        <footer>
+            Start your feature spec in minutes · MVP
+        </footer>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="main.js"></script>
+</body>
 
-    <footer>
-        Start your feature spec in minutes · MVP
-    </footer>
-</div>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <script src="main.js"></script>
-    </body>
 </html>

@@ -2,11 +2,11 @@
 // ---------------- i18n (UI language) ----------------
 const I18N = {
   en: {
-    app_title: "AI Requirements Generator",
+    app_title: "Start your feature spec in minutes",
     app_subtitle:
-      "Create a structured first draft of requirements, acceptance criteria and test cases based on the feature description and knowledge base.",
+      "Turn a rough feature idea into a structured first draft of requirements, acceptance criteria and test cases.",
     feature_title: "Feature description",
-    feature_subtitle: "Describe the feature as you would explain it to your dev team.",
+    feature_subtitle: "",
     feature_placeholder:
       "Describe the feature as you would explain it to your dev team.\n\nInclude:\n– feature goal\n– target users\n– main user flow\n– constraints or edge cases (if any)\n\n5–10 sentences is usually enough.",
     kb_title: "Knowledge base",
@@ -94,7 +94,7 @@ const I18N = {
     alert_files_too_big:
       "File(s) exceed 5 MB and will not be added:",
     alert_duplicate_files: "File is already uploaded and won't be added again:",
-    status_generating_long: "Generating a draft of requirements, acceptance criteria, and test cases… This usually takes under a minute.",
+    status_generating_long: "Generating a structured draft\u2026 This usually takes under a minute.",
     err_generic_title: "Generation failed",
     err_generic_details: "Server returned an unexpected response format.",
     err_timeout_title: "Request timed out",
@@ -114,13 +114,26 @@ const I18N = {
     fb_success: "Thanks! Your feedback has been submitted.",
     fb_error_prefix: "Error:",
     fb_try_again: "Please try again.",
-  },
+      app_description: "Designed for Product Managers and Business Analysts.\nUse as a starting point \u2014 not a final spec.",
+    feature_hint: "The better the input, the more useful the draft.",
+    btn_try_example: "Try with an example",
+    try_example_helper: "See how a well-written input affects the result.",
+    example_feature_text: "Add advanced filters to the orders list so operations managers can quickly find delayed or high-value orders.\nFilters should include status, delivery date and order amount.\nThe list performance should remain under 1 second.",
+    result_microtext: "This is a first draft to help you start.\nIt\u2019s expected that some points may be irrelevant. Remove what doesn\u2019t fit your product.",
+    result_req_title: "Draft requirements",
+    result_ac_title: "Draft acceptance criteria",
+    result_tc_title: "Draft test cases",
+    next_title: "What to do next:",
+    next_item1: "Review and refine requirements",
+    next_item2: "Adjust acceptance criteria to your flows",
+    next_item3: "Use this draft in Confluence, Notion or Jira",
+},
   ru: {
-    app_title: "AI Requirements Generator",
+    app_title: "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u0440\u0430\u0431\u043e\u0442\u0443 \u043d\u0430\u0434 \u0442\u0440\u0435\u0431\u043e\u0432\u0430\u043d\u0438\u044f\u043c\u0438 \u0437\u0430 \u043d\u0435\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u043c\u0438\u043d\u0443\u0442",
     app_subtitle:
-      "Превратите идею фичи в структурированный черновик требований, acceptance criteria и тест-кейсов.",
-    feature_title: "Описание фичи",
-    feature_subtitle: "Опишите фичу так, как вы бы объясняли её команде разработки.",
+      "\u041f\u0440\u0435\u0432\u0440\u0430\u0442\u0438\u0442\u0435 \u0438\u0434\u0435\u044e \u0444\u0438\u0447\u0438 \u0432 \u0441\u0442\u0440\u0443\u043a\u0442\u0443\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a \u0442\u0440\u0435\u0431\u043e\u0432\u0430\u043d\u0438\u0439, acceptance criteria \u0438 \u0442\u0435\u0441\u0442-\u043a\u0435\u0439\u0441\u043e\u0432.",
+    feature_title: "\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u0444\u0438\u0447\u0438",
+    feature_subtitle: "",
     feature_placeholder:
       "Опишите фичу так, как вы бы объясняли её команде разработки.\n\nУкажите:\n– цель фичи\n– пользователей\n– основной пользовательский сценарий\n– ограничения или edge cases (если есть)\n\nОбычно достаточно 5–10 предложений.",
     kb_title: "База знаний",
@@ -143,7 +156,7 @@ const I18N = {
     analysis_mode_label: "Режим анализа",
     analysis_mode_mvp: "Стандартный (MVP)",
     analysis_mode_enterprise: "Enterprise",
-    btn_generate: "Создать черновик",
+    btn_generate: "\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a",
     result_title: "Черновик",
     result_subtitle:
       "Это черновик, который помогает начать работу. Проверьте и адаптируйте перед использованием.",
@@ -208,7 +221,7 @@ const I18N = {
     alert_files_too_big: "Файл(ы) превышают 5 MB и не будут добавлены:",
     alert_duplicate_files:
       "Файл уже загружен и не будет добавлен повторно:",
-    status_generating_long: "Генерируем черновик требований, acceptance criteria и тест-кейсов… Обычно это занимает меньше минуты.",
+    status_generating_long: "\u0413\u0435\u043d\u0435\u0440\u0438\u0440\u0443\u0435\u043c \u0441\u0442\u0440\u0443\u043a\u0442\u0443\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439 \u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a\u2026 \u041e\u0431\u044b\u0447\u043d\u043e \u044d\u0442\u043e \u0437\u0430\u043d\u0438\u043c\u0430\u0435\u0442 \u043c\u0435\u043d\u044c\u0448\u0435 \u043c\u0438\u043d\u0443\u0442\u044b.",
     err_generic_title: "Генерация не отработала",
     err_generic_details: "Сервер вернул ответ в неожиданном формате",
     err_timeout_title: "Превышено время ожидания",
@@ -228,7 +241,20 @@ const I18N = {
     fb_success: "Спасибо! Ваш фидбек успешно отправлен.",
     fb_error_prefix: "Ошибка:",
     fb_try_again: "Пожалуйста, попробуйте еще раз.",
-  },
+      app_description: "\u0418\u043d\u0441\u0442\u0440\u0443\u043c\u0435\u043d\u0442 \u0434\u043b\u044f \u043f\u0440\u043e\u0434\u0430\u043a\u0442-\u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u043e\u0432 \u0438 \u0431\u0438\u0437\u043d\u0435\u0441-\u0430\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u043e\u0432.\n\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435 \u043a\u0430\u043a \u0441\u0442\u0430\u0440\u0442\u043e\u0432\u0443\u044e \u0442\u043e\u0447\u043a\u0443, \u0430 \u043d\u0435 \u0444\u0438\u043d\u0430\u043b\u044c\u043d\u043e\u0435 \u0422\u0417.",
+    feature_hint: "\u0427\u0435\u043c \u0442\u043e\u0447\u043d\u0435\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435, \u0442\u0435\u043c \u043f\u043e\u043b\u0435\u0437\u043d\u0435\u0435 \u0431\u0443\u0434\u0435\u0442 \u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a.",
+    btn_try_example: "\u041f\u043e\u043f\u0440\u043e\u0431\u043e\u0432\u0430\u0442\u044c \u043d\u0430 \u043f\u0440\u0438\u043c\u0435\u0440\u0435",
+    try_example_helper: "\u041f\u043e\u0441\u043c\u043e\u0442\u0440\u0438\u0442\u0435, \u043a\u0430\u043a \u043a\u0430\u0447\u0435\u0441\u0442\u0432\u043e \u0432\u0432\u043e\u0434\u0430 \u0432\u043b\u0438\u044f\u0435\u0442 \u043d\u0430 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442.",
+    example_feature_text: "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0440\u0430\u0441\u0448\u0438\u0440\u0435\u043d\u043d\u044b\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u044b \u0432 \u0441\u043f\u0438\u0441\u043e\u043a \u0437\u0430\u043a\u0430\u0437\u043e\u0432, \u0447\u0442\u043e\u0431\u044b \u043e\u043f\u0435\u0440\u0430\u0446\u0438\u043e\u043d\u043d\u044b\u0435 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u044b \u0431\u044b\u0441\u0442\u0440\u0435\u0435 \u043d\u0430\u0445\u043e\u0434\u0438\u043b\u0438 \u043f\u0440\u043e\u0441\u0440\u043e\u0447\u0435\u043d\u043d\u044b\u0435 \u0438 \u0434\u043e\u0440\u043e\u0433\u0438\u0435 \u0437\u0430\u043a\u0430\u0437\u044b.\n\u0424\u0438\u043b\u044c\u0442\u0440\u044b: \u0441\u0442\u0430\u0442\u0443\u0441, \u0434\u0430\u0442\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0438 \u0438 \u0441\u0443\u043c\u043c\u0430 \u0437\u0430\u043a\u0430\u0437\u0430.\n\u041f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0441\u0442\u044c \u0441\u043f\u0438\u0441\u043a\u0430 \u0434\u043e\u043b\u0436\u043d\u0430 \u043e\u0441\u0442\u0430\u0432\u0430\u0442\u044c\u0441\u044f \u043d\u0435 \u0445\u0443\u0436\u0435 1 \u0441\u0435\u043a\u0443\u043d\u0434\u044b.",
+    result_microtext: "\u042d\u0442\u043e \u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a, \u043a\u043e\u0442\u043e\u0440\u044b\u0439 \u043f\u043e\u043c\u043e\u0433\u0430\u0435\u0442 \u043d\u0430\u0447\u0430\u0442\u044c \u0440\u0430\u0431\u043e\u0442\u0443.\n\u041d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e, \u0435\u0441\u043b\u0438 \u0447\u0430\u0441\u0442\u044c \u043f\u0443\u043d\u043a\u0442\u043e\u0432 \u043e\u043a\u0430\u0436\u0435\u0442\u0441\u044f \u043b\u0438\u0448\u043d\u0435\u0439 \u2014 \u0443\u0434\u0430\u043b\u0438\u0442\u0435 \u0442\u043e, \u0447\u0442\u043e \u043d\u0435 \u043f\u043e\u0434\u0445\u043e\u0434\u0438\u0442 \u0432\u0430\u0448\u0435\u043c\u0443 \u043f\u0440\u043e\u0434\u0443\u043a\u0442\u0443.",
+    result_req_title: "\u0427\u0435\u0440\u043d\u043e\u0432\u0438\u043a \u0442\u0440\u0435\u0431\u043e\u0432\u0430\u043d\u0438\u0439",
+    result_ac_title: "\u0427\u0435\u0440\u043d\u043e\u0432\u0438\u043a acceptance criteria",
+    result_tc_title: "\u0427\u0435\u0440\u043d\u043e\u0432\u0438\u043a \u0442\u0435\u0441\u0442-\u043a\u0435\u0439\u0441\u043e\u0432",
+    next_title: "\u0427\u0442\u043e \u0434\u0435\u043b\u0430\u0442\u044c \u0434\u0430\u043b\u044c\u0448\u0435:",
+    next_item1: "\u041f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u0438 \u0434\u043e\u0440\u0430\u0431\u043e\u0442\u0430\u0442\u044c \u0442\u0440\u0435\u0431\u043e\u0432\u0430\u043d\u0438\u044f",
+    next_item2: "\u0410\u0434\u0430\u043f\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c acceptance criteria \u043f\u043e\u0434 \u0441\u0446\u0435\u043d\u0430\u0440\u0438\u0438",
+    next_item3: "\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u044c \u0447\u0435\u0440\u043d\u043e\u0432\u0438\u043a \u0432 Confluence, Notion \u0438\u043b\u0438 Jira",
+},
 };
 
 function getUiLocale() {
@@ -307,9 +333,26 @@ function initLanguageControls() {
 }
 
 // Initial i18n apply
+function initTryExampleButton() {
+  const btn = document.getElementById("tryExampleBtn");
+  const featureEl = document.getElementById("feature");
+  if (!btn || !featureEl) return;
+
+  btn.addEventListener("click", () => {
+    featureEl.value = t("example_feature_text");
+    featureEl.focus();
+    const end = featureEl.value.length;
+    // place cursor at the end
+    if (typeof featureEl.setSelectionRange === "function") {
+      featureEl.setSelectionRange(end, end);
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   applyTranslations();
   initLanguageControls();
+  initTryExampleButton();
 });
 
 // --- Tooltip icons: do not toggle checkboxes when clicking ⓘ inside labels ---
@@ -477,15 +520,130 @@ function setDraftResultText(text) {
   el.textContent = text;
 }
 
+function splitDraftMarkdown(markdown) {
+  const text = String(markdown || "");
+  const lines = text.split(/\r?\n/);
+
+  // Detect section headings in both EN/RU.
+  const isReq = (s) =>
+    /^(#{1,6}\s*)?(draft\s+requirements|requirements|требования|черновик\s+требований)\b/i.test(s.trim()) ||
+    /^\*\*\s*(draft\s+requirements|requirements|требования)\s*\*\*$/i.test(s.trim());
+
+  const isAC = (s) =>
+    /^(#{1,6}\s*)?(draft\s+acceptance\s+criteria|acceptance\s+criteria|ac|черновик\s+acceptance\s+criteria)\b/i.test(
+      s.trim()
+    ) ||
+    /^\*\*\s*(draft\s+acceptance\s+criteria|acceptance\s+criteria|ac)\s*\*\*$/i.test(s.trim());
+
+  const isTC = (s) =>
+    /^(#{1,6}\s*)?(draft\s+test\s+cases|test\s+cases|тест\s*кейсы|тест-?кейсы|черновик\s+тест)\b/i.test(s.trim()) ||
+    /^\*\*\s*(draft\s+test\s+cases|test\s+cases|тест\s*кейсы|тест-?кейсы)\s*\*\*$/i.test(s.trim());
+
+  let current = "req";
+  const buckets = { req: [], ac: [], tc: [] };
+  let sawAnyHeading = false;
+
+  for (const line of lines) {
+    if (isReq(line)) {
+      current = "req";
+      sawAnyHeading = true;
+      continue;
+    }
+    if (isAC(line)) {
+      current = "ac";
+      sawAnyHeading = true;
+      continue;
+    }
+    if (isTC(line)) {
+      current = "tc";
+      sawAnyHeading = true;
+      continue;
+    }
+    buckets[current].push(line);
+  }
+
+  // If the model output didn't contain recognizable headings, keep everything in requirements.
+  if (!sawAnyHeading) {
+    return { req: text.trim(), ac: "", tc: "" };
+  }
+
+  return {
+    req: buckets.req.join("\n").trim(),
+    ac: buckets.ac.join("\n").trim(),
+    tc: buckets.tc.join("\n").trim(),
+  };
+}
+
+function renderMarkdownInto(containerEl, markdown) {
+  if (!containerEl) return;
+  const md = String(markdown || "").trim();
+  if (!md) {
+    containerEl.textContent = "";
+    return;
+  }
+
+  if (typeof marked !== "undefined") {
+    containerEl.innerHTML = marked.parse(md);
+  } else {
+    containerEl.textContent = md;
+  }
+}
+
 function setDraftResultMarkdown(markdown) {
   const el = document.getElementById("result");
   el.classList.remove("is-loading");
+  el.replaceChildren();
 
-  if (typeof marked !== "undefined") {
-    el.innerHTML = marked.parse(markdown);
-  } else {
-    el.textContent = markdown;
+  const wrap = document.createElement("div");
+  wrap.className = "result-wrap";
+
+  const micro = document.createElement("p");
+  micro.className = "result-microtext";
+  micro.textContent = t("result_microtext");
+  wrap.appendChild(micro);
+
+  const { req, ac, tc } = splitDraftMarkdown(markdown);
+
+  const sections = document.createElement("div");
+  sections.className = "result-sections";
+
+  const makeCard = (titleKey, bodyMd, extraClass) => {
+    const card = document.createElement("div");
+    card.className = "result-card " + (extraClass || "");
+    const h = document.createElement("h3");
+    h.textContent = t(titleKey);
+    const body = document.createElement("div");
+    renderMarkdownInto(body, bodyMd);
+    card.appendChild(h);
+    card.appendChild(body);
+    return card;
+  };
+
+  sections.appendChild(makeCard("result_req_title", req || markdown, "result-card--primary"));
+  sections.appendChild(makeCard("result_ac_title", ac, "result-card--secondary"));
+  sections.appendChild(makeCard("result_tc_title", tc, "result-card--secondary"));
+
+  wrap.appendChild(sections);
+
+  const next = document.createElement("div");
+  next.className = "result-next";
+
+  const nextTitle = document.createElement("div");
+  nextTitle.className = "result-next-title";
+  nextTitle.textContent = t("next_title");
+  next.appendChild(nextTitle);
+
+  const ul = document.createElement("ul");
+  for (const k of ["next_item1", "next_item2", "next_item3"]) {
+    const li = document.createElement("li");
+    li.textContent = t(k);
+    ul.appendChild(li);
   }
+  next.appendChild(ul);
+
+  wrap.appendChild(next);
+
+  el.appendChild(wrap);
 }
 
 
