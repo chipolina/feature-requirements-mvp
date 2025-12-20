@@ -94,7 +94,7 @@ const I18N = {
     alert_files_too_big:
       "File(s) exceed 5 MB and will not be added:",
     alert_duplicate_files: "File is already uploaded and won't be added again:",
-    status_generating_long: "Generating a draft of requirements, acceptance criteria, and test cases. This will take ~30–60 seconds",
+    status_generating_long: "Generating a draft of requirements, acceptance criteria, and test cases… This usually takes under a minute.",
     err_generic_title: "Generation failed",
     err_generic_details: "Server returned an unexpected response format.",
     err_timeout_title: "Request timed out",
@@ -208,7 +208,7 @@ const I18N = {
     alert_files_too_big: "Файл(ы) превышают 5 MB и не будут добавлены:",
     alert_duplicate_files:
       "Файл уже загружен и не будет добавлен повторно:",
-    status_generating_long: "Генерируем черновик требований, AC и тест-кейсов. Это займёт ~30–60 секунд",
+    status_generating_long: "Генерируем черновик требований, acceptance criteria и тест-кейсов… Обычно это занимает меньше минуты.",
     err_generic_title: "Генерация не отработала",
     err_generic_details: "Сервер вернул ответ в неожиданном формате",
     err_timeout_title: "Превышено время ожидания",
