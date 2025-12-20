@@ -69,6 +69,8 @@ export async function handler(event) {
 
     const allowedWouldUse = new Set(["Да", "Нет", "Не уверен(а)"]);
     const allowedUpset = new Set(["Да", "Нет", "Не уверен(а)"]);
+    const now = new Date();
+    const commentDate = formatDate(now);
     
     const fields = {
       "Rating": Number(rating),
@@ -80,6 +82,7 @@ export async function handler(event) {
       "Extra": (extra || "").trim(),
       "Where Manual": (whereManual || "").trim(),
       "Wont Pay For": (wontPayFor || "").trim(),
+      "comment_date": commentDate
     };
     
     // Single select — только если есть валидное значение
@@ -120,6 +123,17 @@ export async function handler(event) {
     if (requestId) {
       fields["Request"] = [{ id: requestId }];
     }
+
+    function formatDate(date) {
+      const pad = (n) => String(n).padStart(2, "0");
+    
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
+             `${pad(date.getHours())}-${pad(date.getMinutes())}`;
+    }
+
+
+
+    
 
     const res = await fetch(
       `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`,
